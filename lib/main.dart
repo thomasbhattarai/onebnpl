@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'loginpage.dart';
+
+import 'package:onebnpl/app/routes.dart';
 
 void main() {
   runApp(const MyApp());
@@ -12,7 +13,8 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: const Loginpage(),
+      initialRoute: AppRoutes.login,
+      routes: appRoutes,
     );
   }
 }

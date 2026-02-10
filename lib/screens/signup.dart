@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'password.dart';
+
+import 'package:onebnpl/app/routes.dart';
 
 class Country {
   final String name;
@@ -332,332 +333,332 @@ class _SignupState extends State<Signup> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Stack(
-        children: [
-          // Background
-          Positioned.fill(
-            child: Image.asset('assets/images/bg.png', fit: BoxFit.cover),
-          ),
+      body: SafeArea(
+        child: Stack(
+          children: [
+            // Background
+            Positioned.fill(
+              child: Image.asset('assets/images/bg.png', fit: BoxFit.cover),
+            ),
 
-          // Top left sign in
-          const Positioned(
-            top: 175,
-            left: 18,
-            child: Text(
-              'Sign In',
-              style: TextStyle(
-                fontSize: 14,
-                color: Colors.white,
-                fontWeight: FontWeight.w500,
+            // Top left sign in
+            const Positioned(
+              top: 175,
+              left: 18,
+              child: Text(
+                'Sign In',
+                style: TextStyle(
+                  fontSize: 14,
+                  color: Colors.white,
+                  fontWeight: FontWeight.w500,
+                ),
               ),
             ),
-          ),
 
-          // Top right logo and tagline
-          Positioned(
-            top: 1,
-            right: 20,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment:
-                  CrossAxisAlignment.center, // center children horizontally
-              children: [
-                SizedBox(
-                  height: 150, // logo height
-                  child: Image.asset(
-                    'assets/images/bnpllogo.png',
-                    fit: BoxFit.contain,
-                  ),
-                ),
-                Transform.translate(
-                  offset: const Offset(0, -60), // move text upwards
-                  child: const Text(
-                    'Live Your Dreams Now',
-                    textAlign: TextAlign.center, // center text
-                    style: TextStyle(
-                      fontSize: 10,
-                      color: Colors.white,
-                      fontWeight: FontWeight.w400,
-                      letterSpacing: 0.25,
-                      height: 1.0,
+            // Top right logo and tagline
+            Positioned(
+              top: 1,
+              right: 20,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment:
+                    CrossAxisAlignment.center, // center children horizontally
+                children: [
+                  SizedBox(
+                    height: 150, // logo height
+                    child: Image.asset(
+                      'assets/images/bnpllogo.png',
+                      fit: BoxFit.contain,
                     ),
                   ),
-                ),
-              ],
-            ),
-          ),
-
-          // Main content card
-          Positioned(
-            left: 14,
-            right: 14,
-            bottom: 0,
-            child: ClipRRect(
-              borderRadius: const BorderRadius.only(
-                topLeft: Radius.circular(26),
-                topRight: Radius.circular(26),
-              ),
-              child: Container(
-                height: 680,
-                decoration: const BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter,
-                    colors: [Color(0xFFF3F0FF), Color(0xFF7A69FF)],
-                  ),
-                ),
-                child: Stack(
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.fromLTRB(18, 18, 18, 16),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.stretch,
-                        children: [
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              const Text(
-                                'Welcome,',
-                                style: TextStyle(
-                                  fontSize: 22,
-                                  color: Color(0xFF4C3EA6),
-                                  fontWeight: FontWeight.w700,
-                                ),
-                              ),
-                              Image.asset(
-                                'assets/images/creditcard.png',
-                                width: 60,
-                                height: 60,
-                              ),
-                            ],
-                          ),
-                          Transform.translate(
-                            offset: const Offset(0, -10),
-                            child: const Text(
-                              'Hello there, sign in to continue.',
-                              style: TextStyle(
-                                fontSize: 13,
-                                color: Color(0xFF6F6F6F),
-                                fontWeight: FontWeight.w400,
-                              ),
-                            ),
-                          ),
-                          const SizedBox(height: 4),
-
-                          Row(
-                            children: const [
-                              Expanded(
-                                child: Divider(
-                                  color: Color(0xFF7B6FF0),
-                                  thickness: 1,
-                                ),
-                              ),
-                              SizedBox(width: 8),
-                              Text(
-                                'Personal Details',
-                                style: TextStyle(
-                                  fontSize: 11.5,
-                                  color: Color(0xFF4C3EA6),
-                                  fontWeight: FontWeight.w600,
-                                ),
-                              ),
-                              SizedBox(width: 8),
-                              Expanded(
-                                child: Divider(
-                                  color: Color(0xFF7B6FF0),
-                                  thickness: 1,
-                                ),
-                              ),
-                            ],
-                          ),
-                          const SizedBox(height: 6),
-
-                          const LabeledInput(label: 'First Name :'),
-                          const SizedBox(height: 6),
-                          const LabeledInput(label: 'Middle Name :'),
-                          const SizedBox(height: 6),
-                          const LabeledInput(label: 'Last Name :'),
-                          const SizedBox(height: 6),
-
-                          const Text(
-                            'Gender :',
-                            style: TextStyle(
-                              fontSize: 11.5,
-                              color: Color(0xFF4C3EA6),
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                          const SizedBox(height: 4),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              GenderOption(
-                                label: 'Male',
-                                isSelected: _selectedGender == 'Male',
-                                onTap: () {
-                                  setState(() {
-                                    _selectedGender = 'Male';
-                                  });
-                                },
-                              ),
-                              GenderOption(
-                                label: 'Female',
-                                isSelected: _selectedGender == 'Female',
-                                onTap: () {
-                                  setState(() {
-                                    _selectedGender = 'Female';
-                                  });
-                                },
-                              ),
-                              GenderOption(
-                                label: 'Others',
-                                isSelected: _selectedGender == 'Others',
-                                onTap: () {
-                                  setState(() {
-                                    _selectedGender = 'Others';
-                                  });
-                                },
-                              ),
-                            ],
-                          ),
-                          const SizedBox(height: 6),
-
-                          LabeledCountryDropdown(
-                            label: 'Country :',
-                            value: _selectedCountry,
-                            items: _countries,
-                            hintText: 'Select Country',
-                            onChanged: (value) {
-                              if (value == null) {
-                                return;
-                              }
-                              setState(() {
-                                _selectedCountry = value;
-                                if (_selectedCountry.name != 'Nepal') {
-                                  _selectedProvince = null;
-                                  _selectedDistrict = null;
-                                }
-                              });
-                            },
-                          ),
-                          const SizedBox(height: 6),
-                          if (_selectedCountry.name == 'Nepal')
-                            LabeledDropdown(
-                              label: 'Province :',
-                              value: _selectedProvince,
-                              items: _provinces,
-                              hintText: 'Select Province',
-                              onChanged: (value) {
-                                setState(() {
-                                  _selectedProvince = value;
-                                  _selectedDistrict = null;
-                                });
-                              },
-                            )
-                          else
-                            const LabeledInput(label: 'Address :'),
-                          const SizedBox(height: 6),
-                          if (_selectedCountry.name == 'Nepal')
-                            LabeledDropdown(
-                              label: 'District :',
-                              value: _selectedDistrict,
-                              items: _selectedProvince == null
-                                  ? const []
-                                  : _districtsByProvince[_selectedProvince] ??
-                                        const [],
-                              hintText: _selectedProvince == null
-                                  ? 'Select Province First'
-                                  : 'Select District',
-                              onChanged: _selectedProvince == null
-                                  ? null
-                                  : (value) {
-                                      setState(() {
-                                        _selectedDistrict = value;
-                                      });
-                                    },
-                            )
-                          else
-                            const SizedBox.shrink(),
-                          const SizedBox(height: 6),
-                          const LabeledInput(label: 'Email :'),
-
-                          const SizedBox(height: 20),
-
-                          Align(
-                            alignment: Alignment.centerRight,
-                            child: SizedBox(
-                              width: 130,
-                              height: 32,
-                              child: ElevatedButton(
-                                onPressed: () {
-                                  Navigator.of(context).push(
-                                    MaterialPageRoute(
-                                      builder: (context) => const Password(),
-                                    ),
-                                  );
-                                },
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: const Color(0xFF4E46D9),
-                                  elevation: 0,
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(9),
-                                  ),
-                                ),
-                                child: const Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Text(
-                                      'Next',
-                                      style: TextStyle(
-                                        fontSize: 12,
-                                        fontWeight: FontWeight.w600,
-                                        color: Colors.white,
-                                      ),
-                                    ),
-                                    SizedBox(width: 6),
-                                    Icon(
-                                      Icons.arrow_forward,
-                                      size: 16,
-                                      color: Colors.white,
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                          ),
-                        ],
+                  Transform.translate(
+                    offset: const Offset(0, -60), // move text upwards
+                    child: const Text(
+                      'Live Your Dreams Now',
+                      textAlign: TextAlign.center, // center text
+                      style: TextStyle(
+                        fontSize: 10,
+                        color: Colors.white,
+                        fontWeight: FontWeight.w400,
+                        letterSpacing: 0.25,
+                        height: 1.0,
                       ),
                     ),
+                  ),
+                ],
+              ),
+            ),
 
-                    // Bottom illustration
-                    Positioned(
-                      left: 8,
-                      bottom: 10,
-                      child: SizedBox(
-                        width: 170,
-                        height: 110,
-                        child: Stack(
+            // Main content card
+            Positioned(
+              left: 14,
+              right: 14,
+              bottom: 0,
+              child: ClipRRect(
+                borderRadius: const BorderRadius.only(
+                  topLeft: Radius.circular(26),
+                  topRight: Radius.circular(26),
+                ),
+                child: Container(
+                  height: 680,
+                  decoration: const BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                      colors: [Color(0xFFF3F0FF), Color(0xFF7A69FF)],
+                    ),
+                  ),
+                  child: Stack(
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.fromLTRB(18, 18, 18, 16),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
                           children: [
-                            Positioned(
-                              left: 10,
-                              bottom: 0,
-                              child: Image.asset(
-                                'assets/images/gigure.png',
-                                width: 160,
-                                height: 120,
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                const Text(
+                                  'Welcome,',
+                                  style: TextStyle(
+                                    fontSize: 22,
+                                    color: Color(0xFF4C3EA6),
+                                    fontWeight: FontWeight.w700,
+                                  ),
+                                ),
+                                Image.asset(
+                                  'assets/images/creditcard.png',
+                                  width: 60,
+                                  height: 60,
+                                ),
+                              ],
+                            ),
+                            Transform.translate(
+                              offset: const Offset(0, -10),
+                              child: const Text(
+                                'Hello there, sign in to continue.',
+                                style: TextStyle(
+                                  fontSize: 13,
+                                  color: Color(0xFF6F6F6F),
+                                  fontWeight: FontWeight.w400,
+                                ),
+                              ),
+                            ),
+                            const SizedBox(height: 4),
+
+                            Row(
+                              children: const [
+                                Expanded(
+                                  child: Divider(
+                                    color: Color(0xFF7B6FF0),
+                                    thickness: 1,
+                                  ),
+                                ),
+                                SizedBox(width: 8),
+                                Text(
+                                  'Personal Details',
+                                  style: TextStyle(
+                                    fontSize: 11.5,
+                                    color: Color(0xFF4C3EA6),
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                                SizedBox(width: 8),
+                                Expanded(
+                                  child: Divider(
+                                    color: Color(0xFF7B6FF0),
+                                    thickness: 1,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 6),
+
+                            const LabeledInput(label: 'First Name :'),
+                            const SizedBox(height: 6),
+                            const LabeledInput(label: 'Middle Name :'),
+                            const SizedBox(height: 6),
+                            const LabeledInput(label: 'Last Name :'),
+                            const SizedBox(height: 6),
+
+                            const Text(
+                              'Gender :',
+                              style: TextStyle(
+                                fontSize: 11.5,
+                                color: Color(0xFF4C3EA6),
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                            const SizedBox(height: 4),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                GenderOption(
+                                  label: 'Male',
+                                  isSelected: _selectedGender == 'Male',
+                                  onTap: () {
+                                    setState(() {
+                                      _selectedGender = 'Male';
+                                    });
+                                  },
+                                ),
+                                GenderOption(
+                                  label: 'Female',
+                                  isSelected: _selectedGender == 'Female',
+                                  onTap: () {
+                                    setState(() {
+                                      _selectedGender = 'Female';
+                                    });
+                                  },
+                                ),
+                                GenderOption(
+                                  label: 'Others',
+                                  isSelected: _selectedGender == 'Others',
+                                  onTap: () {
+                                    setState(() {
+                                      _selectedGender = 'Others';
+                                    });
+                                  },
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 6),
+
+                            LabeledCountryDropdown(
+                              label: 'Country :',
+                              value: _selectedCountry,
+                              items: _countries,
+                              hintText: 'Select Country',
+                              onChanged: (value) {
+                                if (value == null) {
+                                  return;
+                                }
+                                setState(() {
+                                  _selectedCountry = value;
+                                  if (_selectedCountry.name != 'Nepal') {
+                                    _selectedProvince = null;
+                                    _selectedDistrict = null;
+                                  }
+                                });
+                              },
+                            ),
+                            const SizedBox(height: 6),
+                            if (_selectedCountry.name == 'Nepal')
+                              LabeledDropdown(
+                                label: 'Province :',
+                                value: _selectedProvince,
+                                items: _provinces,
+                                hintText: 'Select Province',
+                                onChanged: (value) {
+                                  setState(() {
+                                    _selectedProvince = value;
+                                    _selectedDistrict = null;
+                                  });
+                                },
+                              )
+                            else
+                              const LabeledInput(label: 'Address :'),
+                            const SizedBox(height: 6),
+                            if (_selectedCountry.name == 'Nepal')
+                              LabeledDropdown(
+                                label: 'District :',
+                                value: _selectedDistrict,
+                                items: _selectedProvince == null
+                                    ? const []
+                                    : _districtsByProvince[_selectedProvince] ??
+                                          const [],
+                                hintText: _selectedProvince == null
+                                    ? 'Select Province First'
+                                    : 'Select District',
+                                onChanged: _selectedProvince == null
+                                    ? null
+                                    : (value) {
+                                        setState(() {
+                                          _selectedDistrict = value;
+                                        });
+                                      },
+                              )
+                            else
+                              const SizedBox.shrink(),
+                            const SizedBox(height: 6),
+                            const LabeledInput(label: 'Email :'),
+
+                            const SizedBox(height: 20),
+
+                            Align(
+                              alignment: Alignment.centerRight,
+                              child: SizedBox(
+                                width: 130,
+                                height: 32,
+                                child: ElevatedButton(
+                                  onPressed: () {
+                                    Navigator.of(
+                                      context,
+                                    ).pushNamed(AppRoutes.password);
+                                  },
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: const Color(0xFF4E46D9),
+                                    elevation: 0,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(9),
+                                    ),
+                                  ),
+                                  child: const Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Text(
+                                        'Next',
+                                        style: TextStyle(
+                                          fontSize: 12,
+                                          fontWeight: FontWeight.w600,
+                                          color: Colors.white,
+                                        ),
+                                      ),
+                                      SizedBox(width: 6),
+                                      Icon(
+                                        Icons.arrow_forward,
+                                        size: 16,
+                                        color: Colors.white,
+                                      ),
+                                    ],
+                                  ),
+                                ),
                               ),
                             ),
                           ],
                         ),
                       ),
-                    ),
-                  ],
+
+                      // Bottom illustration
+                      Positioned(
+                        left: 8,
+                        bottom: 10,
+                        child: SizedBox(
+                          width: 170,
+                          height: 110,
+                          child: Stack(
+                            children: [
+                              Positioned(
+                                left: 10,
+                                bottom: 0,
+                                child: Image.asset(
+                                  'assets/images/gigure.png',
+                                  width: 160,
+                                  height: 120,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
