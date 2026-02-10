@@ -180,7 +180,7 @@ class Profilecompleted extends StatelessWidget {
                                   'By Creating this account you agree with our ',
                             ),
                             TextSpan(
-                              text: 'terms and conditions',
+                              text: 'Terms and Conditions',
                               style: const TextStyle(
                                 color: Color(0xFFE53935),
                                 fontWeight: FontWeight.w600,

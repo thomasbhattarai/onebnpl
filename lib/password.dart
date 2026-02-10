@@ -1,10 +1,47 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 import 'profilecompleted.dart';
 
-class Password extends StatelessWidget {
+class Password extends StatefulWidget {
   const Password({super.key});
+
+  @override
+  State<Password> createState() => _PasswordState();
+}
+
+class _PasswordState extends State<Password> {
+  final List<TextEditingController> _pinControllers = List.generate(
+    6,
+    (_) => TextEditingController(),
+  );
+  final List<FocusNode> _pinFocusNodes = List.generate(6, (_) => FocusNode());
+  final List<TextEditingController> _confirmControllers = List.generate(
+    6,
+    (_) => TextEditingController(),
+  );
+  final List<FocusNode> _confirmFocusNodes = List.generate(
+    6,
+    (_) => FocusNode(),
+  );
+
+  @override
+  void dispose() {
+    for (final controller in _pinControllers) {
+      controller.dispose();
+    }
+    for (final node in _pinFocusNodes) {
+      node.dispose();
+    }
+    for (final controller in _confirmControllers) {
+      controller.dispose();
+    }
+    for (final node in _confirmFocusNodes) {
+      node.dispose();
+    }
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -107,7 +144,7 @@ class Password extends StatelessWidget {
                           const SizedBox(height: 20),
 
                           const Text(
-                            'Enter Your Password',
+                            'Enter Your PIN',
                             style: TextStyle(
                               fontSize: 12,
                               color: Color(0xFF4C3EA6),
@@ -115,11 +152,14 @@ class Password extends StatelessWidget {
                             ),
                           ),
                           const SizedBox(height: 8),
-                          const LabeledInput(obscure: true),
+                          _buildPinRow(
+                            controllers: _pinControllers,
+                            focusNodes: _pinFocusNodes,
+                          ),
                           const SizedBox(height: 12),
 
                           const Text(
-                            'Confirm Password',
+                            'Confirm PIN',
                             style: TextStyle(
                               fontSize: 12,
                               color: Color(0xFF4C3EA6),
@@ -127,9 +167,12 @@ class Password extends StatelessWidget {
                             ),
                           ),
                           const SizedBox(height: 8),
-                          const LabeledInput(obscure: true),
+                          _buildPinRow(
+                            controllers: _confirmControllers,
+                            focusNodes: _confirmFocusNodes,
+                          ),
 
-                          SizedBox(height: 20),
+                          const SizedBox(height: 20),
 
                           Align(
                             alignment: Alignment.centerRight,
@@ -186,7 +229,7 @@ class Password extends StatelessWidget {
                                   'By Creating this account you agree with our ',
                             ),
                             TextSpan(
-                              text: 'terms and conditions',
+                              text: 'Terms and Conditions',
                               style: const TextStyle(
                                 color: Color(0xFFE53935),
                                 fontWeight: FontWeight.w600,
@@ -229,35 +272,55 @@ class Password extends StatelessWidget {
       ),
     );
   }
-}
 
-class LabeledInput extends StatelessWidget {
-  final bool obscure;
-
-  const LabeledInput({super.key, this.obscure = false});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      height: 38,
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(10),
-        boxShadow: const [
-          BoxShadow(
-            color: Color(0x3D6C63C8),
-            blurRadius: 8,
-            offset: Offset(0, 3),
+  Widget _buildPinRow({
+    required List<TextEditingController> controllers,
+    required List<FocusNode> focusNodes,
+  }) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: List.generate(6, (index) {
+        return SizedBox(
+          width: 42,
+          height: 42,
+          child: TextField(
+            controller: controllers[index],
+            focusNode: focusNodes[index],
+            keyboardType: TextInputType.number,
+            textAlign: TextAlign.center,
+            maxLength: 1,
+            inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+            decoration: InputDecoration(
+              counterText: '',
+              filled: true,
+              fillColor: Colors.white,
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(10),
+                borderSide: const BorderSide(
+                  color: Color(0xFF8E83E8),
+                  width: 1,
+                ),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(10),
+                borderSide: const BorderSide(
+                  color: Color(0xFF4E46D9),
+                  width: 1.5,
+                ),
+              ),
+            ),
+            onChanged: (value) {
+              if (value.isNotEmpty) {
+                if (index < focusNodes.length - 1) {
+                  focusNodes[index + 1].requestFocus();
+                } else {
+                  focusNodes[index].unfocus();
+                }
+              }
+            },
           ),
-        ],
-      ),
-      child: TextField(
-        obscureText: obscure,
-        decoration: const InputDecoration(
-          border: InputBorder.none,
-          contentPadding: EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-        ),
-      ),
+        );
+      }),
     );
   }
 }

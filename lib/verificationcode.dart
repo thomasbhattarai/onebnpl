@@ -1,10 +1,33 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 import 'signup.dart';
 
-class Verificationcode extends StatelessWidget {
+class Verificationcode extends StatefulWidget {
   const Verificationcode({super.key});
+
+  @override
+  State<Verificationcode> createState() => _VerificationcodeState();
+}
+
+class _VerificationcodeState extends State<Verificationcode> {
+  final List<TextEditingController> _controllers = List.generate(
+    5,
+    (_) => TextEditingController(),
+  );
+  final List<FocusNode> _focusNodes = List.generate(5, (_) => FocusNode());
+
+  @override
+  void dispose() {
+    for (final controller in _controllers) {
+      controller.dispose();
+    }
+    for (final node in _focusNodes) {
+      node.dispose();
+    }
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -150,16 +173,46 @@ class Verificationcode extends StatelessWidget {
                                 padding: EdgeInsets.only(
                                   right: index == 4 ? 0 : 8,
                                 ),
-                                child: Container(
+                                child: SizedBox(
                                   width: 48,
                                   height: 48,
-                                  decoration: BoxDecoration(
-                                    color: Colors.white,
-                                    borderRadius: BorderRadius.circular(8),
-                                    border: Border.all(
-                                      color: const Color(0xFF8E83E8),
-                                      width: 1,
+                                  child: TextField(
+                                    controller: _controllers[index],
+                                    focusNode: _focusNodes[index],
+                                    keyboardType: TextInputType.number,
+                                    textAlign: TextAlign.center,
+                                    maxLength: 1,
+                                    inputFormatters: [
+                                      FilteringTextInputFormatter.digitsOnly,
+                                    ],
+                                    decoration: InputDecoration(
+                                      counterText: '',
+                                      filled: true,
+                                      fillColor: Colors.white,
+                                      enabledBorder: OutlineInputBorder(
+                                        borderRadius: BorderRadius.circular(8),
+                                        borderSide: const BorderSide(
+                                          color: Color(0xFF8E83E8),
+                                          width: 1,
+                                        ),
+                                      ),
+                                      focusedBorder: OutlineInputBorder(
+                                        borderRadius: BorderRadius.circular(8),
+                                        borderSide: const BorderSide(
+                                          color: Color(0xFF4E46D9),
+                                          width: 1.5,
+                                        ),
+                                      ),
                                     ),
+                                    onChanged: (value) {
+                                      if (value.isNotEmpty) {
+                                        if (index < _focusNodes.length - 1) {
+                                          _focusNodes[index + 1].requestFocus();
+                                        } else {
+                                          _focusNodes[index].unfocus();
+                                        }
+                                      }
+                                    },
                                   ),
                                 ),
                               );
@@ -241,7 +294,7 @@ class Verificationcode extends StatelessWidget {
                                       'By Creating this account you agree with our ',
                                 ),
                                 TextSpan(
-                                  text: 'terms and conditions',
+                                  text: 'Terms and onditions',
                                   style: const TextStyle(
                                     color: Color(0xFFE53935),
                                     fontWeight: FontWeight.w600,

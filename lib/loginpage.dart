@@ -1,9 +1,23 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'phonenumberverify.dart';
 
-class Loginpage extends StatelessWidget {
+class Loginpage extends StatefulWidget {
   const Loginpage({super.key});
+
+  @override
+  State<Loginpage> createState() => _LoginpageState();
+}
+
+class _LoginpageState extends State<Loginpage> {
+  final TextEditingController _pinController = TextEditingController();
+
+  @override
+  void dispose() {
+    _pinController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -58,7 +72,7 @@ class Loginpage extends StatelessWidget {
                     Align(
                       alignment: const Alignment(0, -0.5),
                       child: Text(
-                        'Live your dreams now',
+                        'Live Your Dreams Now',
                         textAlign: TextAlign.center,
                         style: const TextStyle(
                           fontSize: 16,
@@ -182,9 +196,97 @@ class Loginpage extends StatelessWidget {
                           const SizedBox(height: 26),
 
                           // Inputs
-                          const InputField(hint: "Username"),
+                          const Text(
+                            'Username',
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: Color(0xFF4C3EA6),
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+                          const InputField(hint: ""),
                           const SizedBox(height: 16),
-                          const InputField(hint: "Password", obscure: true),
+                          const Text(
+                            'PIN',
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: Color(0xFF4C3EA6),
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+                          Container(
+                            height: 44,
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(12),
+                              boxShadow: const [
+                                BoxShadow(
+                                  color: Color(0x3D6C63C8),
+                                  blurRadius: 8,
+                                  offset: Offset(0, 3),
+                                ),
+                              ],
+                            ),
+                            child: Stack(
+                              alignment: Alignment.center,
+                              children: [
+                                Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 16,
+                                  ),
+                                  child: Row(
+                                    children: List.generate(6, (index) {
+                                      final text = _pinController.text;
+                                      final char = index < text.length
+                                          ? text[index]
+                                          : '_';
+                                      return Expanded(
+                                        child: Text(
+                                          char,
+                                          textAlign: TextAlign.center,
+                                          style: const TextStyle(
+                                            fontSize: 18,
+                                            color: Color(0xFF6F6F6F),
+                                            fontWeight: FontWeight.w600,
+                                          ),
+                                        ),
+                                      );
+                                    }),
+                                  ),
+                                ),
+                                Positioned.fill(
+                                  child: TextField(
+                                    controller: _pinController,
+                                    keyboardType: TextInputType.number,
+                                    textAlign: TextAlign.start,
+                                    textAlignVertical: TextAlignVertical.center,
+                                    maxLength: 6,
+                                    inputFormatters: [
+                                      FilteringTextInputFormatter.digitsOnly,
+                                    ],
+                                    style: const TextStyle(
+                                      fontSize: 18,
+                                      color: Colors.transparent,
+                                      letterSpacing: 18,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                    showCursor: false,
+                                    decoration: const InputDecoration(
+                                      counterText: '',
+                                      border: InputBorder.none,
+                                      contentPadding: EdgeInsets.symmetric(
+                                        horizontal: 16,
+                                        vertical: 12,
+                                      ),
+                                    ),
+                                    onChanged: (_) => setState(() {}),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
 
                           const SizedBox(height: 22),
 
@@ -203,7 +305,7 @@ class Loginpage extends StatelessWidget {
                                   ),
                                 ),
                                 child: const Text(
-                                  "Create Account",
+                                  "Login",
                                   style: TextStyle(
                                     fontSize: 13.5,
                                     fontWeight: FontWeight.w600,
