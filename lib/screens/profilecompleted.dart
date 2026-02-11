@@ -1,6 +1,8 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 
+import 'package:onebnpl/app/routes.dart';
+
 class Profilecompleted extends StatelessWidget {
   const Profilecompleted({super.key});
 
@@ -115,7 +117,11 @@ class Profilecompleted extends StatelessWidget {
                                 width: 150,
                                 height: 36,
                                 child: ElevatedButton(
-                                  onPressed: () {},
+                                  onPressed: () {
+                                    Navigator.of(
+                                      context,
+                                    ).pushReplacementNamed(AppRoutes.login);
+                                  },
                                   style: ElevatedButton.styleFrom(
                                     backgroundColor: const Color(0xFF4E46D9),
                                     elevation: 0,

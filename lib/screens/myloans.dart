@@ -70,7 +70,14 @@ class MyLoansPage extends StatelessWidget {
                           Expanded(
                             child: Container(
                               decoration: BoxDecoration(
-                                color: const Color(0xFFF5F2FF),
+                                gradient: const LinearGradient(
+                                  begin: Alignment.topCenter,
+                                  end: Alignment.bottomCenter,
+                                  colors: [
+                                    Color(0xFFF2EDFF),
+                                    Color(0xFF6C5BFF),
+                                  ],
+                                ),
                                 borderRadius: const BorderRadius.only(
                                   topLeft: Radius.circular(18),
                                   topRight: Radius.circular(18),

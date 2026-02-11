@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:onebnpl/screens/homepage.dart';
 import 'package:onebnpl/screens/loginpage.dart';
 import 'package:onebnpl/screens/myloans.dart';
+import 'package:onebnpl/screens/offer.dart';
 import 'package:onebnpl/screens/password.dart';
 import 'package:onebnpl/screens/phonenumberverify.dart';
 import 'package:onebnpl/screens/profilecompleted.dart';
@@ -14,6 +15,7 @@ class AppRoutes {
   static const login = '/login';
   static const home = '/home';
   static const myLoans = '/my-loans';
+  static const offer = '/offer';
   static const qrCode = '/qr-code';
   static const phoneVerify = '/phone-verify';
   static const verificationCode = '/verification-code';
@@ -26,6 +28,7 @@ final Map<String, WidgetBuilder> appRoutes = {
   AppRoutes.login: (_) => const Loginpage(),
   AppRoutes.home: (_) => const Homepage(),
   AppRoutes.myLoans: (_) => const MyLoansPage(),
+  AppRoutes.offer: (_) => const OfferPage(),
   AppRoutes.qrCode: (_) => const QrcodePage(),
   AppRoutes.phoneVerify: (_) => const Phonenumberverify(),
   AppRoutes.verificationCode: (_) => const Verificationcode(),

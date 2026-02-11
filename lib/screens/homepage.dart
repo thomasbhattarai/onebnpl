@@ -1,8 +1,13 @@
 import 'package:flutter/material.dart';
-
 import 'package:onebnpl/app/routes.dart';
+import 'package:onebnpl/data/finance_summary_data.dart';
+import 'package:onebnpl/data/promo_card_data.dart';
 import 'package:onebnpl/data/top_items_data.dart';
+import 'package:onebnpl/data/user_profile_data.dart';
+import 'package:onebnpl/models/finance_summary.dart';
+import 'package:onebnpl/models/promo_card.dart';
 import 'package:onebnpl/models/top_item.dart';
+import 'package:onebnpl/models/user_profile.dart';
 
 const double _bottomNavHeight = 80;
 
@@ -94,7 +99,7 @@ class Homepage extends StatelessWidget {
                               ),
                               padding: const EdgeInsets.fromLTRB(
                                 16,
-                                46,
+                                24,
                                 16,
                                 56,
                               ),
@@ -105,7 +110,7 @@ class Homepage extends StatelessWidget {
                                     mainAxisAlignment:
                                         MainAxisAlignment.spaceBetween,
                                     children: [
-                                      const Column(
+                                      Column(
                                         crossAxisAlignment:
                                             CrossAxisAlignment.start,
                                         children: [
@@ -118,13 +123,21 @@ class Homepage extends StatelessWidget {
                                             ),
                                           ),
                                           SizedBox(height: 2),
-                                          Text(
-                                            'Thomas Bhattarai',
-                                            style: TextStyle(
-                                              fontSize: 13.5,
-                                              color: Color(0xFF4C3EA6),
-                                              fontWeight: FontWeight.w700,
-                                            ),
+                                          FutureBuilder<UserProfile>(
+                                            future:
+                                                UserProfileRepository.fetchProfile(),
+                                            builder: (context, snapshot) {
+                                              final name =
+                                                  snapshot.data?.fullName;
+                                              return Text(
+                                                name ?? 'Loading...',
+                                                style: const TextStyle(
+                                                  fontSize: 13.5,
+                                                  color: Color(0xFF4C3EA6),
+                                                  fontWeight: FontWeight.w700,
+                                                ),
+                                              );
+                                            },
                                           ),
                                         ],
                                       ),
@@ -160,8 +173,8 @@ class Homepage extends StatelessWidget {
                                     child: Stack(
                                       children: [
                                         Positioned(
-                                          left: 10,
-                                          top: 10,
+                                          left: 0,
+                                          top: 0,
                                           child: Container(
                                             padding: const EdgeInsets.symmetric(
                                               horizontal: 12,
@@ -172,43 +185,28 @@ class Homepage extends StatelessWidget {
                                               borderRadius:
                                                   BorderRadius.circular(10),
                                             ),
-                                            child: const Text(
-                                              'My Balance: 00,000\nMy Loan: 00,000\nNo of EMI: 00\nNearest EMI: 6/12/2026',
-                                              style: TextStyle(
-                                                fontSize: 10,
-                                                color: Colors.white,
-                                                fontWeight: FontWeight.w500,
-                                                height: 1.2,
-                                              ),
-                                            ),
-                                          ),
-                                        ),
-                                        const Center(
-                                          child: Text(
-                                            'ONEBNPL',
-                                            style: TextStyle(
-                                              fontSize: 26,
-                                              letterSpacing: 2,
-                                              color: Colors.white,
-                                              fontWeight: FontWeight.w800,
-                                            ),
-                                          ),
-                                        ),
-                                        Positioned(
-                                          right: 10,
-                                          bottom: 10,
-                                          child: Container(
-                                            width: 28,
-                                            height: 28,
-                                            decoration: BoxDecoration(
-                                              color: Colors.white,
-                                              borderRadius:
-                                                  BorderRadius.circular(14),
-                                            ),
-                                            child: const Icon(
-                                              Icons.arrow_forward,
-                                              color: Color(0xFF4E46D9),
-                                              size: 18,
+                                            child: FutureBuilder<FinanceSummary>(
+                                              future:
+                                                  FinanceSummaryRepository.fetchSummary(),
+                                              builder: (context, snapshot) {
+                                                final summary = snapshot.data;
+                                                final text = summary == null
+                                                    ? 'Loading...'
+                                                    : 'My Balance: ${summary.balance}\n'
+                                                          'My Loan: ${summary.loan}\n'
+                                                          'No of EMI: ${summary.emiCount}\n'
+                                                          'Nearest EMI: ${summary.nearestEmi}';
+
+                                                return Text(
+                                                  text,
+                                                  style: const TextStyle(
+                                                    fontSize: 10,
+                                                    color: Colors.white,
+                                                    fontWeight: FontWeight.w500,
+                                                    height: 1.2,
+                                                  ),
+                                                );
+                                              },
                                             ),
                                           ),
                                         ),
@@ -316,66 +314,106 @@ class Homepage extends StatelessWidget {
                                     },
                                   ),
                                   const SizedBox(height: 14),
-                                  Container(
-                                    height: 140,
-                                    decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(14),
-                                      image: const DecorationImage(
-                                        image: AssetImage(
-                                          'assets/images/lprect.png',
-                                        ),
-                                        fit: BoxFit.cover,
-                                      ),
-                                    ),
-                                    child: Padding(
-                                      padding: const EdgeInsets.fromLTRB(
-                                        14,
-                                        12,
-                                        14,
-                                        12,
-                                      ),
-                                      child: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          const Text(
-                                            'LEGION',
-                                            style: TextStyle(
-                                              fontSize: 20,
-                                              color: Colors.white,
-                                              fontWeight: FontWeight.w800,
+                                  FutureBuilder<PromoCard>(
+                                    future:
+                                        PromoCardRepository.fetchPromoCard(),
+                                    builder: (context, snapshot) {
+                                      final promo = snapshot.data;
+                                      if (promo == null) {
+                                        return Container(
+                                          height: 140,
+                                          alignment: Alignment.center,
+                                          decoration: BoxDecoration(
+                                            color: Colors.white,
+                                            borderRadius: BorderRadius.circular(
+                                              14,
                                             ),
                                           ),
-                                          const Text(
-                                            'by Lenovo',
+                                          child: const Text(
+                                            'Loading...',
                                             style: TextStyle(
                                               fontSize: 12,
-                                              color: Colors.white70,
+                                              color: Color(0xFF6F6F6F),
+                                              fontWeight: FontWeight.w600,
                                             ),
                                           ),
-                                          const Spacer(),
-                                          Container(
-                                            padding: const EdgeInsets.symmetric(
-                                              horizontal: 10,
-                                              vertical: 6,
-                                            ),
-                                            decoration: BoxDecoration(
-                                              color: Colors.white,
-                                              borderRadius:
-                                                  BorderRadius.circular(12),
-                                            ),
-                                            child: const Text(
-                                              'PRE-ORDER NOW',
-                                              style: TextStyle(
-                                                fontSize: 10,
-                                                color: Color(0xFF4E46D9),
-                                                fontWeight: FontWeight.w700,
+                                        );
+                                      }
+
+                                      return Container(
+                                        height: 140,
+                                        decoration: BoxDecoration(
+                                          borderRadius: BorderRadius.circular(
+                                            14,
+                                          ),
+                                          image: DecorationImage(
+                                            image: AssetImage(promo.imagePath),
+                                            fit: BoxFit.cover,
+                                          ),
+                                        ),
+                                        child: Padding(
+                                          padding: const EdgeInsets.fromLTRB(
+                                            14,
+                                            12,
+                                            14,
+                                            12,
+                                          ),
+                                          child: Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              Text(
+                                                promo.title,
+                                                style: const TextStyle(
+                                                  fontSize: 20,
+                                                  color: Colors.white,
+                                                  fontWeight: FontWeight.w800,
+                                                ),
                                               ),
-                                            ),
+                                              Text(
+                                                promo.subtitle,
+                                                style: const TextStyle(
+                                                  fontSize: 12,
+                                                  color: Colors.white70,
+                                                ),
+                                              ),
+                                              const Spacer(),
+                                              GestureDetector(
+                                                onTap: () {
+                                                  Navigator.pushNamed(
+                                                    context,
+                                                    AppRoutes.offer,
+                                                  );
+                                                },
+                                                child: Container(
+                                                  padding:
+                                                      const EdgeInsets.symmetric(
+                                                        horizontal: 10,
+                                                        vertical: 6,
+                                                      ),
+                                                  decoration: BoxDecoration(
+                                                    color: Colors.white,
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                          12,
+                                                        ),
+                                                  ),
+                                                  child: Text(
+                                                    promo.ctaText,
+                                                    style: const TextStyle(
+                                                      fontSize: 10,
+                                                      color: Color(0xFF4E46D9),
+                                                      fontWeight:
+                                                          FontWeight.w700,
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
+                                            ],
                                           ),
-                                        ],
-                                      ),
-                                    ),
+                                        ),
+                                      );
+                                    },
                                   ),
                                 ],
                               ),
@@ -501,7 +539,12 @@ class _BottomNav extends StatelessWidget {
             ),
             const _BottomNavItem(icon: Icons.grid_view_rounded),
             _BottomNavItem(icon: Icons.qr_code_2_rounded, onTap: onQrTap),
-            const _BottomNavItem(icon: Icons.card_giftcard),
+            _BottomNavItem(
+              icon: Icons.card_giftcard,
+              onTap: () {
+                Navigator.pushNamed(context, AppRoutes.offer);
+              },
+            ),
           ],
         ),
       ),
