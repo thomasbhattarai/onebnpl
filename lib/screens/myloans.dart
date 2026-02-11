@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:onebnpl/app/routes.dart';
+import 'package:onebnpl/screens/explorer.dart';
 
 const double _bottomNavHeight = 80;
 
@@ -361,7 +362,15 @@ class _BottomNav extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             _BottomNavItem(icon: Icons.home, label: 'Home', onTap: onHomeTap),
-            const _BottomNavItem(icon: Icons.grid_view_rounded),
+            _BottomNavItem(
+              icon: Icons.grid_view_rounded,
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => const ExplorerPage()),
+                );
+              },
+            ),
             const _BottomNavItem(icon: Icons.qr_code_2_rounded),
             const _BottomNavItem(icon: Icons.card_giftcard),
           ],

@@ -1,36 +1,17 @@
 import 'package:flutter/material.dart';
 
 import 'package:onebnpl/app/routes.dart';
+import 'package:onebnpl/data/offers_data.dart';
+import 'package:onebnpl/data/user_profile_data.dart';
+import 'package:onebnpl/models/offer.dart';
+import 'package:onebnpl/models/user_profile.dart';
+import 'package:onebnpl/screens/explorer.dart';
 
 class OfferPage extends StatelessWidget {
   const OfferPage({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final offers = const [
-      _OfferItem(
-        title: 'Dell Latitude 3420',
-        subtitle: 'Grab your at 15% off',
-        oldPrice: '80,000',
-        newPrice: '68,000',
-        imagePath: 'assets/images/dell.png',
-      ),
-      _OfferItem(
-        title: 'Dell Inspiron 3501',
-        subtitle: 'Grab your at 15% off',
-        oldPrice: '80,000',
-        newPrice: '68,000',
-        imagePath: 'assets/images/lenovo.png',
-      ),
-      _OfferItem(
-        title: 'iPhone 17 pro max',
-        subtitle: 'Grab your at 6% off',
-        oldPrice: '2,70,000',
-        newPrice: '2,53,800',
-        imagePath: 'assets/images/p.png',
-      ),
-    ];
-
     return Scaffold(
       extendBody: false,
       body: SafeArea(
@@ -125,8 +106,8 @@ class OfferPage extends StatelessWidget {
                                       Column(
                                         crossAxisAlignment:
                                             CrossAxisAlignment.start,
-                                        children: const [
-                                          Text(
+                                        children: [
+                                          const Text(
                                             'Hi,',
                                             style: TextStyle(
                                               fontSize: 12,
@@ -134,14 +115,22 @@ class OfferPage extends StatelessWidget {
                                               fontWeight: FontWeight.w600,
                                             ),
                                           ),
-                                          SizedBox(height: 2),
-                                          Text(
-                                            'Thomas Bhattarai',
-                                            style: TextStyle(
-                                              fontSize: 13.5,
-                                              color: Color(0xFF4C3EA6),
-                                              fontWeight: FontWeight.w700,
-                                            ),
+                                          const SizedBox(height: 2),
+                                          FutureBuilder<UserProfile>(
+                                            future:
+                                                UserProfileRepository.fetchProfile(),
+                                            builder: (context, snapshot) {
+                                              final name =
+                                                  snapshot.data?.fullName;
+                                              return Text(
+                                                name ?? 'Loading...',
+                                                style: const TextStyle(
+                                                  fontSize: 13.5,
+                                                  color: Color(0xFF4C3EA6),
+                                                  fontWeight: FontWeight.w700,
+                                                ),
+                                              );
+                                            },
                                           ),
                                         ],
                                       ),
@@ -172,41 +161,65 @@ class OfferPage extends StatelessWidget {
                                     ),
                                   ),
                                   const SizedBox(height: 12),
-                                  Container(
-                                    decoration: BoxDecoration(
-                                      gradient: const LinearGradient(
-                                        begin: Alignment.topCenter,
-                                        end: Alignment.bottomCenter,
-                                        colors: [
-                                          Color(0xFFF2EDFF),
-                                          Color(0xFF8F86FF),
-                                        ],
-                                      ),
-                                      borderRadius: BorderRadius.circular(14),
-                                    ),
-                                    padding: const EdgeInsets.fromLTRB(
-                                      12,
-                                      12,
-                                      12,
-                                      12,
-                                    ),
-                                    child: Column(
-                                      children:
-                                          offers
-                                              .map(
-                                                (offer) => Padding(
-                                                  padding:
-                                                      const EdgeInsets.only(
-                                                        bottom: 12,
-                                                      ),
-                                                  child: _OfferCard(
-                                                    item: offer,
-                                                  ),
-                                                ),
-                                              )
-                                              .toList()
-                                            ..removeLast(),
-                                    ),
+                                  FutureBuilder<List<Offer>>(
+                                    future: OffersRepository.fetchOffers(),
+                                    builder: (context, snapshot) {
+                                      final items =
+                                          snapshot.data ?? const <Offer>[];
+                                      if (snapshot.connectionState ==
+                                              ConnectionState.waiting &&
+                                          items.isEmpty) {
+                                        return const Center(
+                                          child: Padding(
+                                            padding: EdgeInsets.symmetric(
+                                              vertical: 16,
+                                            ),
+                                            child: Text(
+                                              'Loading...',
+                                              style: TextStyle(
+                                                fontSize: 12,
+                                                color: Color(0xFF6F6F6F),
+                                                fontWeight: FontWeight.w600,
+                                              ),
+                                            ),
+                                          ),
+                                        );
+                                      }
+
+                                      if (items.isEmpty) {
+                                        return const Center(
+                                          child: Padding(
+                                            padding: EdgeInsets.symmetric(
+                                              vertical: 16,
+                                            ),
+                                            child: Text(
+                                              'No offers available',
+                                              style: TextStyle(
+                                                fontSize: 12,
+                                                color: Color(0xFF6F6F6F),
+                                                fontWeight: FontWeight.w600,
+                                              ),
+                                            ),
+                                          ),
+                                        );
+                                      }
+
+                                      return Column(
+                                        children: List.generate(
+                                          items.length,
+                                          (index) => Padding(
+                                            padding: EdgeInsets.only(
+                                              bottom: index == items.length - 1
+                                                  ? 0
+                                                  : 12,
+                                            ),
+                                            child: _OfferCard(
+                                              item: items[index],
+                                            ),
+                                          ),
+                                        ),
+                                      );
+                                    },
                                   ),
                                 ],
                               ),
@@ -232,24 +245,8 @@ class OfferPage extends StatelessWidget {
   }
 }
 
-class _OfferItem {
-  final String title;
-  final String subtitle;
-  final String oldPrice;
-  final String newPrice;
-  final String imagePath;
-
-  const _OfferItem({
-    required this.title,
-    required this.subtitle,
-    required this.oldPrice,
-    required this.newPrice,
-    required this.imagePath,
-  });
-}
-
 class _OfferCard extends StatelessWidget {
-  final _OfferItem item;
+  final Offer item;
 
   const _OfferCard({required this.item});
 
@@ -355,7 +352,19 @@ class _BottomNav extends StatelessWidget {
               onTap: onHomeTap,
               child: const Icon(Icons.home, color: Colors.white, size: 24),
             ),
-            const Icon(Icons.grid_view_rounded, color: Colors.white, size: 24),
+            GestureDetector(
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => const ExplorerPage()),
+                );
+              },
+              child: const Icon(
+                Icons.grid_view_rounded,
+                color: Colors.white,
+                size: 24,
+              ),
+            ),
             GestureDetector(
               onTap: onQrTap,
               child: const Icon(

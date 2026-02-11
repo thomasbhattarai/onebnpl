@@ -1,7 +1,9 @@
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 
-import 'package:onebnpl/app/routes.dart';
+import 'package:onebnpl/screens/explorer.dart';
+import 'package:onebnpl/screens/homepage.dart';
+import 'package:onebnpl/screens/offer.dart';
 
 const double _bottomNavHeight = 80;
 
@@ -58,7 +60,7 @@ class _QrcodePageState extends State<QrcodePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       extendBody: false,
-      backgroundColor: Colors.black,
+      backgroundColor: Colors.white,
       body: SafeArea(
         child: Stack(
           children: [
@@ -67,10 +69,7 @@ class _QrcodePageState extends State<QrcodePage> {
           ],
         ),
       ),
-      bottomNavigationBar: _BottomNav(
-        onHomeTap: () =>
-            Navigator.pushReplacementNamed(context, AppRoutes.home),
-      ),
+      bottomNavigationBar: const _BottomNav(),
     );
   }
 
@@ -174,9 +173,17 @@ class _QrcodePageState extends State<QrcodePage> {
 }
 
 class _BottomNav extends StatelessWidget {
-  final VoidCallback? onHomeTap;
+  const _BottomNav({Key? key}) : super(key: key);
 
-  const _BottomNav({this.onHomeTap, Key? key}) : super(key: key);
+  void _pushInstant(BuildContext context, Widget page) {
+    Navigator.of(context).pushReplacement(
+      PageRouteBuilder(
+        pageBuilder: (_, __, ___) => page,
+        transitionDuration: Duration.zero,
+        reverseTransitionDuration: Duration.zero,
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -193,14 +200,26 @@ class _BottomNav extends StatelessWidget {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            _BottomNavItem(icon: Icons.home, label: 'Home', onTap: onHomeTap),
-            const _BottomNavItem(icon: Icons.grid_view_rounded),
+            _BottomNavItem(
+              icon: Icons.home,
+              label: 'Home',
+              onTap: () => _pushInstant(context, const Homepage()),
+            ),
+            _BottomNavItem(
+              icon: Icons.grid_view_rounded,
+              onTap: () {
+                _pushInstant(context, const ExplorerPage());
+              },
+            ),
             const _BottomNavItem(
               icon: Icons.qr_code_2_rounded,
               active: true,
               label: 'QR',
             ),
-            const _BottomNavItem(icon: Icons.card_giftcard),
+            _BottomNavItem(
+              icon: Icons.card_giftcard,
+              onTap: () => _pushInstant(context, const OfferPage()),
+            ),
           ],
         ),
       ),

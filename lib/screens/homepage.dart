@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:onebnpl/app/routes.dart';
+import 'package:onebnpl/screens/explorer.dart';
 import 'package:onebnpl/data/finance_summary_data.dart';
 import 'package:onebnpl/data/promo_card_data.dart';
 import 'package:onebnpl/data/top_items_data.dart';
@@ -36,9 +37,8 @@ class Homepage extends StatelessWidget {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
-                          Positioned(
-                            top: 1,
-                            left: 16,
+                          Align(
+                            alignment: Alignment.centerLeft,
                             child: Column(
                               mainAxisSize: MainAxisSize.min,
                               crossAxisAlignment: CrossAxisAlignment.start,
@@ -537,7 +537,15 @@ class _BottomNav extends StatelessWidget {
               label: 'Home',
               onTap: onHomeTap,
             ),
-            const _BottomNavItem(icon: Icons.grid_view_rounded),
+            _BottomNavItem(
+              icon: Icons.grid_view_rounded,
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => const ExplorerPage()),
+                );
+              },
+            ),
             _BottomNavItem(icon: Icons.qr_code_2_rounded, onTap: onQrTap),
             _BottomNavItem(
               icon: Icons.card_giftcard,

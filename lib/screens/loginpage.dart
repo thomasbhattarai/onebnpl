@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import 'package:onebnpl/app/routes.dart';
+import 'package:onebnpl/widgets/phone_country_data.dart';
 
 class Loginpage extends StatefulWidget {
   const Loginpage({super.key});
@@ -12,11 +13,23 @@ class Loginpage extends StatefulWidget {
 }
 
 class _LoginpageState extends State<Loginpage> {
+  late Country _selectedCountry;
+  final TextEditingController _phoneController = TextEditingController();
   final TextEditingController _pinController = TextEditingController();
   final FocusNode _pinFocusNode = FocusNode();
 
   @override
+  void initState() {
+    super.initState();
+    _selectedCountry = phoneCountries.firstWhere(
+      (country) => country.code == 'NP',
+      orElse: () => phoneCountries.first,
+    );
+  }
+
+  @override
   void dispose() {
+    _phoneController.dispose();
     _pinController.dispose();
     _pinFocusNode.dispose();
     super.dispose();
@@ -198,7 +211,7 @@ class _LoginpageState extends State<Loginpage> {
 
                             // Inputs
                             const Text(
-                              'Username',
+                              'Phone number',
                               style: TextStyle(
                                 fontSize: 12,
                                 color: Color(0xFF4C3EA6),
@@ -206,7 +219,99 @@ class _LoginpageState extends State<Loginpage> {
                               ),
                             ),
                             const SizedBox(height: 8),
-                            const InputField(hint: ""),
+                            Container(
+                              height: 44,
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(12),
+                                boxShadow: const [
+                                  BoxShadow(
+                                    color: Color(0x3D6C63C8),
+                                    blurRadius: 8,
+                                    offset: Offset(0, 3),
+                                  ),
+                                ],
+                              ),
+                              child: Row(
+                                children: [
+                                  const SizedBox(width: 8),
+                                  DropdownButtonHideUnderline(
+                                    child: DropdownButton<Country>(
+                                      value: _selectedCountry,
+                                      isDense: true,
+                                      icon: const Icon(
+                                        Icons.keyboard_arrow_down,
+                                        color: Color(0xFF6F6F6F),
+                                      ),
+                                      items: phoneCountries
+                                          .map(
+                                            (
+                                              country,
+                                            ) => DropdownMenuItem<Country>(
+                                              value: country,
+                                              child: Row(
+                                                children: [
+                                                  Text(
+                                                    flagEmoji(country.code),
+                                                    style: const TextStyle(
+                                                      fontSize: 16,
+                                                    ),
+                                                  ),
+                                                  const SizedBox(width: 6),
+                                                  Text(
+                                                    '${country.code} ${country.dialCode}',
+                                                    style: const TextStyle(
+                                                      fontSize: 12,
+                                                      color: Color(0xFF4C3EA6),
+                                                      fontWeight:
+                                                          FontWeight.w600,
+                                                    ),
+                                                  ),
+                                                  const SizedBox(width: 8),
+                                                ],
+                                              ),
+                                            ),
+                                          )
+                                          .toList(),
+                                      onChanged: (value) {
+                                        if (value == null) {
+                                          return;
+                                        }
+                                        setState(() {
+                                          _selectedCountry = value;
+                                        });
+                                      },
+                                    ),
+                                  ),
+                                  const VerticalDivider(
+                                    width: 16,
+                                    thickness: 1,
+                                    color: Color(0xFFE0E0E0),
+                                  ),
+                                  Expanded(
+                                    child: TextField(
+                                      controller: _phoneController,
+                                      decoration: const InputDecoration(
+                                        hintText: '',
+                                        hintStyle: TextStyle(
+                                          fontSize: 12.5,
+                                          color: Color(0xFF6F6F6F),
+                                        ),
+                                        border: InputBorder.none,
+                                        contentPadding: EdgeInsets.symmetric(
+                                          horizontal: 12,
+                                          vertical: 12,
+                                        ),
+                                      ),
+                                      keyboardType: TextInputType.phone,
+                                      inputFormatters: [
+                                        FilteringTextInputFormatter.digitsOnly,
+                                      ],
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
                             const SizedBox(height: 16),
                             const Text(
                               'PIN',
@@ -279,7 +384,7 @@ class _LoginpageState extends State<Loginpage> {
                                           letterSpacing: 18,
                                           fontWeight: FontWeight.w600,
                                         ),
-                                        showCursor: true,
+                                        showCursor: false,
                                         cursorColor: const Color(0xFF4E46D9),
                                         decoration: const InputDecoration(
                                           counterText: '',
@@ -306,6 +411,23 @@ class _LoginpageState extends State<Loginpage> {
                                 height: 42,
                                 child: ElevatedButton(
                                   onPressed: () {
+                                    final phone = _phoneController.text.trim();
+                                    final pin = _pinController.text.trim();
+                                    final phoneValid = phone.length >= 7;
+                                    final pinValid = pin.length == 6;
+                                    if (!phoneValid || !pinValid) {
+                                      ScaffoldMessenger.of(
+                                        context,
+                                      ).showSnackBar(
+                                        const SnackBar(
+                                          content: Text(
+                                            'Enter a valid phone number and 6-digit PIN.',
+                                          ),
+                                        ),
+                                      );
+                                      return;
+                                    }
+
                                     Navigator.of(
                                       context,
                                     ).pushReplacementNamed(AppRoutes.home);
