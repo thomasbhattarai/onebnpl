@@ -16,6 +16,7 @@ class _LoginpageState extends State<Loginpage> {
   late Country _selectedCountry;
   final TextEditingController _phoneController = TextEditingController();
   final TextEditingController _pinController = TextEditingController();
+  final FocusNode _phoneFocusNode = FocusNode();
   final FocusNode _pinFocusNode = FocusNode();
 
   @override
@@ -25,12 +26,25 @@ class _LoginpageState extends State<Loginpage> {
       (country) => country.code == 'NP',
       orElse: () => phoneCountries.first,
     );
+    _phoneFocusNode.addListener(() {
+      if (!mounted) {
+        return;
+      }
+      setState(() {});
+    });
+    _pinFocusNode.addListener(() {
+      if (!mounted) {
+        return;
+      }
+      setState(() {});
+    });
   }
 
   @override
   void dispose() {
     _phoneController.dispose();
     _pinController.dispose();
+    _phoneFocusNode.dispose();
     _pinFocusNode.dispose();
     super.dispose();
   }
@@ -289,26 +303,109 @@ class _LoginpageState extends State<Loginpage> {
                                     color: Color(0xFFE0E0E0),
                                   ),
                                   Expanded(
-                                    child: TextField(
-                                      controller: _phoneController,
-                                      decoration: const InputDecoration(
-                                        hintText: '',
-                                        hintStyle: TextStyle(
-                                          fontSize: 12.5,
-                                          color: Color(0xFF6F6F6F),
-                                        ),
-                                        border: InputBorder.none,
-                                        contentPadding: EdgeInsets.symmetric(
-                                          horizontal: 12,
-                                          vertical: 12,
-                                        ),
+                                    child: GestureDetector(
+                                      behavior: HitTestBehavior.opaque,
+                                      onTap: () =>
+                                          _phoneFocusNode.requestFocus(),
+                                      child: Stack(
+                                        alignment: Alignment.center,
+                                        children: [
+                                          Padding(
+                                            padding: const EdgeInsets.only(
+                                              left: 4,
+                                              right: 12,
+                                            ),
+                                            child: Row(
+                                              children: List.generate(10, (
+                                                index,
+                                              ) {
+                                                final text =
+                                                    _phoneController.text;
+                                                final char = index < text.length
+                                                    ? text[index]
+                                                    : '';
+                                                final showCaret =
+                                                    _phoneFocusNode.hasFocus &&
+                                                    text.length < 10 &&
+                                                    index == text.length;
+                                                return Expanded(
+                                                  child: Stack(
+                                                    alignment: Alignment.center,
+                                                    children: [
+                                                      Text(
+                                                        char,
+                                                        textAlign:
+                                                            TextAlign.center,
+                                                        style: const TextStyle(
+                                                          fontSize: 16,
+                                                          color: Color(
+                                                            0xFF6F6F6F,
+                                                          ),
+                                                          fontWeight:
+                                                              FontWeight.w600,
+                                                        ),
+                                                      ),
+                                                      if (showCaret)
+                                                        Container(
+                                                          width: 2,
+                                                          height: 18,
+                                                          decoration: BoxDecoration(
+                                                            color: const Color(
+                                                              0xFF4E46D9,
+                                                            ),
+                                                            borderRadius:
+                                                                BorderRadius.circular(
+                                                                  2,
+                                                                ),
+                                                          ),
+                                                        ),
+                                                    ],
+                                                  ),
+                                                );
+                                              }),
+                                            ),
+                                          ),
+                                          Positioned.fill(
+                                            child: TextField(
+                                              controller: _phoneController,
+                                              focusNode: _phoneFocusNode,
+                                              keyboardType:
+                                                  TextInputType.number,
+                                              textAlign: TextAlign.start,
+                                              textAlignVertical:
+                                                  TextAlignVertical.center,
+                                              maxLength: 10,
+                                              inputFormatters: [
+                                                FilteringTextInputFormatter
+                                                    .digitsOnly,
+                                                LengthLimitingTextInputFormatter(
+                                                  10,
+                                                ),
+                                              ],
+                                              style: const TextStyle(
+                                                fontSize: 16,
+                                                color: Colors.transparent,
+                                                letterSpacing: 18,
+                                                fontWeight: FontWeight.w600,
+                                              ),
+                                              showCursor: false,
+                                              cursorColor: const Color(
+                                                0xFF4E46D9,
+                                              ),
+                                              decoration: const InputDecoration(
+                                                counterText: '',
+                                                border: InputBorder.none,
+                                                contentPadding:
+                                                    EdgeInsets.symmetric(
+                                                      horizontal: 4,
+                                                      vertical: 12,
+                                                    ),
+                                              ),
+                                              onChanged: (_) => setState(() {}),
+                                            ),
+                                          ),
+                                        ],
                                       ),
-                                      keyboardType: TextInputType.phone,
-                                      inputFormatters: [
-                                        FilteringTextInputFormatter.digitsOnly,
-                                        if (_selectedCountry.code == 'NP')
-                                          LengthLimitingTextInputFormatter(10),
-                                      ],
                                     ),
                                   ),
                                 ],
@@ -350,18 +447,41 @@ class _LoginpageState extends State<Loginpage> {
                                       child: Row(
                                         children: List.generate(6, (index) {
                                           final text = _pinController.text;
+                                          final showCaret =
+                                              _pinFocusNode.hasFocus &&
+                                              text.length < 6 &&
+                                              index == text.length;
                                           final char = index < text.length
                                               ? text[index]
-                                              : '_';
+                                              : (showCaret ? '' : '_');
                                           return Expanded(
-                                            child: Text(
-                                              char,
-                                              textAlign: TextAlign.center,
-                                              style: const TextStyle(
-                                                fontSize: 18,
-                                                color: Color(0xFF6F6F6F),
-                                                fontWeight: FontWeight.w600,
-                                              ),
+                                            child: Stack(
+                                              alignment: Alignment.center,
+                                              children: [
+                                                Text(
+                                                  char,
+                                                  textAlign: TextAlign.center,
+                                                  style: const TextStyle(
+                                                    fontSize: 18,
+                                                    color: Color(0xFF6F6F6F),
+                                                    fontWeight: FontWeight.w600,
+                                                  ),
+                                                ),
+                                                if (showCaret)
+                                                  Container(
+                                                    width: 2,
+                                                    height: 20,
+                                                    decoration: BoxDecoration(
+                                                      color: const Color(
+                                                        0xFF4E46D9,
+                                                      ),
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                            2,
+                                                          ),
+                                                    ),
+                                                  ),
+                                              ],
                                             ),
                                           );
                                         }),
@@ -467,21 +587,23 @@ class _LoginpageState extends State<Loginpage> {
                       Positioned(
                         left: 10,
                         bottom: 12,
-                        child: SizedBox(
-                          width: 190,
-                          height: 130,
-                          child: Stack(
-                            children: [
-                              Positioned(
-                                left: 10,
-                                bottom: 0,
-                                child: Image.asset(
-                                  'assets/images/gigure.png',
-                                  width: 180,
-                                  height: 140,
+                        child: IgnorePointer(
+                          child: SizedBox(
+                            width: 190,
+                            height: 130,
+                            child: Stack(
+                              children: [
+                                Positioned(
+                                  left: 10,
+                                  bottom: 0,
+                                  child: Image.asset(
+                                    'assets/images/gigure.png',
+                                    width: 180,
+                                    height: 140,
+                                  ),
                                 ),
-                              ),
-                            ],
+                              ],
+                            ),
                           ),
                         ),
                       ),

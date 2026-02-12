@@ -5,8 +5,7 @@ import 'package:onebnpl/data/offers_data.dart';
 import 'package:onebnpl/data/user_profile_data.dart';
 import 'package:onebnpl/models/offer.dart';
 import 'package:onebnpl/models/user_profile.dart';
-import 'package:onebnpl/screens/explorer.dart';
-import 'package:onebnpl/screens/qrcode.dart';
+import 'package:onebnpl/widgets/bottom_navigation.dart';
 
 class OfferPage extends StatelessWidget {
   const OfferPage({super.key});
@@ -236,19 +235,7 @@ class OfferPage extends StatelessWidget {
           },
         ),
       ),
-      bottomNavigationBar: _BottomNav(
-        onHomeTap: () =>
-            Navigator.pushReplacementNamed(context, AppRoutes.home),
-        onQrTap: () {
-          Navigator.of(context).pushReplacement(
-            PageRouteBuilder(
-              pageBuilder: (_, __, ___) => const QrcodePage(),
-              transitionDuration: Duration.zero,
-              reverseTransitionDuration: Duration.zero,
-            ),
-          );
-        },
-      ),
+      bottomNavigationBar: const AppBottomNavigation(activeIndex: 3),
     );
   }
 }
@@ -331,86 +318,6 @@ class _OfferCard extends StatelessWidget {
                   ],
                 ),
               ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _BottomNav extends StatelessWidget {
-  final VoidCallback? onHomeTap;
-  final VoidCallback? onQrTap;
-
-  const _BottomNav({this.onHomeTap, this.onQrTap});
-
-  @override
-  Widget build(BuildContext context) {
-    return SafeArea(
-      top: false,
-      child: Container(
-        height: 72,
-        padding: const EdgeInsets.symmetric(horizontal: 20),
-        decoration: const BoxDecoration(color: Color(0xFF0B0716)),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            GestureDetector(
-              onTap: onHomeTap,
-              child: const Icon(Icons.home, color: Colors.white, size: 24),
-            ),
-            GestureDetector(
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (_) => const ExplorerPage()),
-                );
-              },
-              child: const Icon(
-                Icons.grid_view_rounded,
-                color: Colors.white,
-                size: 24,
-              ),
-            ),
-            GestureDetector(
-              onTap: onQrTap,
-              child: const Icon(
-                Icons.qr_code_2_rounded,
-                color: Colors.white,
-                size: 24,
-              ),
-            ),
-            const _ActiveOffer(),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class _ActiveOffer extends StatelessWidget {
-  const _ActiveOffer();
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      height: 36,
-      padding: const EdgeInsets.symmetric(horizontal: 14),
-      decoration: BoxDecoration(
-        color: const Color(0xFFCFC3FF),
-        borderRadius: BorderRadius.circular(18),
-      ),
-      child: Row(
-        children: const [
-          Icon(Icons.card_giftcard, color: Color(0xFF0B0716), size: 20),
-          SizedBox(width: 6),
-          Text(
-            'Offers',
-            style: TextStyle(
-              fontSize: 12,
-              color: Color(0xFF0B0716),
-              fontWeight: FontWeight.w700,
             ),
           ),
         ],

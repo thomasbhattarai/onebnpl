@@ -1,13 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 import 'package:onebnpl/app/routes.dart';
-import 'package:onebnpl/screens/qrcode.dart';
 import 'package:onebnpl/data/products_data.dart';
 import 'package:onebnpl/data/user_profile_data.dart';
 import 'package:onebnpl/models/product.dart';
 import 'package:onebnpl/models/user_profile.dart';
-
-const double _bottomNavHeight = 80;
+import 'package:onebnpl/widgets/bottom_navigation.dart';
 
 class ExplorerPage extends StatefulWidget {
   const ExplorerPage({super.key});
@@ -37,12 +36,19 @@ class _ExplorerPageState extends State<ExplorerPage> {
 
     return Scaffold(
       extendBody: false,
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        toolbarHeight: 0,
+        systemOverlayStyle: SystemUiOverlayStyle.light,
+      ),
       body: Stack(
         children: [
           Positioned.fill(
             child: Image.asset('assets/images/bg.png', fit: BoxFit.cover),
           ),
           SafeArea(
+            top: false,
             child: Column(
               children: [
                 Padding(
@@ -285,23 +291,7 @@ class _ExplorerPageState extends State<ExplorerPage> {
           ),
         ],
       ),
-      bottomNavigationBar: _BottomNav(
-        onHomeTap: () {
-          Navigator.pushReplacementNamed(context, AppRoutes.home);
-        },
-        onQrTap: () {
-          Navigator.of(context).pushReplacement(
-            PageRouteBuilder(
-              pageBuilder: (_, __, ___) => const QrcodePage(),
-              transitionDuration: Duration.zero,
-              reverseTransitionDuration: Duration.zero,
-            ),
-          );
-        },
-        onOfferTap: () {
-          Navigator.pushNamed(context, AppRoutes.offer);
-        },
-      ),
+      bottomNavigationBar: const AppBottomNavigation(activeIndex: 1),
     );
   }
 }
@@ -432,95 +422,6 @@ class _ProductCard extends StatelessWidget {
           ),
         ],
       ),
-    );
-  }
-}
-
-class _BottomNav extends StatelessWidget {
-  final VoidCallback? onHomeTap;
-  final VoidCallback? onQrTap;
-  final VoidCallback? onOfferTap;
-
-  const _BottomNav({this.onHomeTap, this.onQrTap, this.onOfferTap, Key? key})
-    : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return SafeArea(
-      top: false,
-      child: Container(
-        height: _bottomNavHeight,
-        margin: const EdgeInsets.fromLTRB(0, 0, 0, 0),
-        decoration: BoxDecoration(
-          color: const Color(0xFF0B0716),
-          borderRadius: BorderRadius.circular(0),
-        ),
-        padding: const EdgeInsets.symmetric(horizontal: 20),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            _BottomNavItem(icon: Icons.home, label: 'Home', onTap: onHomeTap),
-            const _BottomNavItem(
-              icon: Icons.grid_view_rounded,
-              active: true,
-              label: 'Explore',
-            ),
-            _BottomNavItem(icon: Icons.qr_code_2_rounded, onTap: onQrTap),
-            _BottomNavItem(icon: Icons.card_giftcard, onTap: onOfferTap),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class _BottomNavItem extends StatelessWidget {
-  final IconData icon;
-  final bool active;
-  final String? label;
-  final VoidCallback? onTap;
-
-  const _BottomNavItem({
-    required this.icon,
-    this.active = false,
-    this.label,
-    this.onTap,
-    Key? key,
-  }) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    if (active) {
-      return GestureDetector(
-        onTap: onTap,
-        child: Container(
-          height: 38,
-          padding: const EdgeInsets.symmetric(horizontal: 16),
-          decoration: BoxDecoration(
-            color: const Color(0xFFCFC3FF),
-            borderRadius: BorderRadius.circular(18),
-          ),
-          child: Row(
-            children: [
-              Icon(icon, color: const Color(0xFF0B0716), size: 22),
-              const SizedBox(width: 8),
-              Text(
-                label ?? '',
-                style: const TextStyle(
-                  fontSize: 14,
-                  color: Color(0xFF0B0716),
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            ],
-          ),
-        ),
-      );
-    }
-
-    return GestureDetector(
-      onTap: onTap,
-      child: Icon(icon, color: Colors.white, size: 24),
     );
   }
 }

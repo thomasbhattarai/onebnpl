@@ -696,21 +696,23 @@ class _SignupState extends State<Signup> {
                       Positioned(
                         left: 8,
                         bottom: 10,
-                        child: SizedBox(
-                          width: 170,
-                          height: 110,
-                          child: Stack(
-                            children: [
-                              Positioned(
-                                left: 10,
-                                bottom: 0,
-                                child: Image.asset(
-                                  'assets/images/gigure.png',
-                                  width: 160,
-                                  height: 120,
+                        child: IgnorePointer(
+                          child: SizedBox(
+                            width: 170,
+                            height: 110,
+                            child: Stack(
+                              children: [
+                                Positioned(
+                                  left: 10,
+                                  bottom: 0,
+                                  child: Image.asset(
+                                    'assets/images/gigure.png',
+                                    width: 160,
+                                    height: 120,
+                                  ),
                                 ),
-                              ),
-                            ],
+                              ],
+                            ),
                           ),
                         ),
                       ),

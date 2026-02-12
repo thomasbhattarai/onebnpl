@@ -1,13 +1,45 @@
 import 'package:flutter/material.dart';
 
 import 'package:onebnpl/app/routes.dart';
-import 'package:onebnpl/screens/explorer.dart';
-import 'package:onebnpl/screens/qrcode.dart';
+import 'package:onebnpl/data/loans_data.dart';
+import 'package:onebnpl/models/loan.dart';
+import 'package:onebnpl/services/loan_service.dart';
+import 'package:onebnpl/widgets/bottom_navigation.dart';
 
-const double _bottomNavHeight = 80;
-
-class MyLoansPage extends StatelessWidget {
+class MyLoansPage extends StatefulWidget {
   const MyLoansPage({super.key});
+
+  @override
+  State<MyLoansPage> createState() => _MyLoansPageState();
+}
+
+class _MyLoansPageState extends State<MyLoansPage> {
+  final LoanService _loanService = LoanService();
+  final List<Loan> _fallbackLoans = demoLoans;
+  late Future<List<Loan>> _loansFuture;
+
+  @override
+  void initState() {
+    super.initState();
+    _loansFuture = _loanService.fetchLoans();
+  }
+
+  void _retryLoad() {
+    setState(() {
+      _loansFuture = _loanService.fetchLoans();
+    });
+  }
+
+  Widget _buildLoansList(List<Loan> loans) {
+    return Column(
+      children: [
+        for (int i = 0; i < loans.length; i++) ...[
+          _LoanCard(loan: loans[i]),
+          if (i != loans.length - 1) const SizedBox(height: 12),
+        ],
+      ],
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -171,11 +203,35 @@ class MyLoansPage extends StatelessWidget {
                                     ),
                                   ),
                                   const SizedBox(height: 12),
-                                  const Expanded(child: _LoanCard(days: 7)),
-                                  const SizedBox(height: 12),
-                                  const Expanded(child: _LoanCard(days: 18)),
-                                  const SizedBox(height: 12),
-                                  const Expanded(child: _LoanCard(days: 23)),
+                                  FutureBuilder<List<Loan>>(
+                                    future: _loansFuture,
+                                    builder: (context, snapshot) {
+                                      if (snapshot.connectionState ==
+                                          ConnectionState.waiting) {
+                                        return const Padding(
+                                          padding: EdgeInsets.symmetric(
+                                            vertical: 24,
+                                          ),
+                                          child: Center(
+                                            child: CircularProgressIndicator(
+                                              color: Color(0xFF6A5AFF),
+                                            ),
+                                          ),
+                                        );
+                                      }
+
+                                      if (snapshot.hasError) {
+                                        return _buildLoansList(_fallbackLoans);
+                                      }
+
+                                      final loans = snapshot.data ?? [];
+                                      if (loans.isEmpty) {
+                                        return _buildLoansList(_fallbackLoans);
+                                      }
+
+                                      return _buildLoansList(loans);
+                                    },
+                                  ),
                                 ],
                               ),
                             ),
@@ -190,27 +246,15 @@ class MyLoansPage extends StatelessWidget {
           },
         ),
       ),
-      bottomNavigationBar: _BottomNav(
-        onHomeTap: () =>
-            Navigator.pushReplacementNamed(context, AppRoutes.home),
-        onQrTap: () {
-          Navigator.of(context).pushReplacement(
-            PageRouteBuilder(
-              pageBuilder: (_, __, ___) => const QrcodePage(),
-              transitionDuration: Duration.zero,
-              reverseTransitionDuration: Duration.zero,
-            ),
-          );
-        },
-      ),
+      bottomNavigationBar: const AppBottomNavigation(activeIndex: -1),
     );
   }
 }
 
 class _LoanCard extends StatelessWidget {
-  final int days;
+  final Loan loan;
 
-  const _LoanCard({required this.days});
+  const _LoanCard({required this.loan});
 
   @override
   Widget build(BuildContext context) {
@@ -229,22 +273,22 @@ class _LoanCard extends StatelessWidget {
       ),
       child: Row(
         children: [
-          _LoanDial(days: days),
+          _LoanDial(days: loan.daysToEmi, progress: loan.progress),
           const SizedBox(width: 14),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
-                  'Lenovo Laptop',
+                Text(
+                  loan.title,
                   style: TextStyle(
                     fontSize: 12,
                     color: Color(0xFF2E2E2E),
                     fontWeight: FontWeight.w700,
                   ),
                 ),
-                const Text(
-                  'IT mart',
+                Text(
+                  loan.merchant,
                   style: TextStyle(
                     fontSize: 10,
                     color: Color(0xFF7A7A7A),
@@ -252,16 +296,16 @@ class _LoanCard extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 6),
-                const Text(
-                  'Outstanding :',
+                Text(
+                  'Outstanding : ${loan.outstanding}',
                   style: TextStyle(
                     fontSize: 10,
                     color: Color(0xFF6A6A6A),
                     fontWeight: FontWeight.w500,
                   ),
                 ),
-                const Text(
-                  'Next EMI :',
+                Text(
+                  'Next EMI : ${loan.nextEmi}',
                   style: TextStyle(
                     fontSize: 10,
                     color: Color(0xFF6A6A6A),
@@ -287,8 +331,9 @@ class _LoanCard extends StatelessWidget {
 
 class _LoanDial extends StatelessWidget {
   final int days;
+  final double progress;
 
-  const _LoanDial({required this.days});
+  const _LoanDial({required this.days, required this.progress});
 
   @override
   Widget build(BuildContext context) {
@@ -302,7 +347,7 @@ class _LoanDial extends StatelessWidget {
             width: 84,
             height: 84,
             child: CircularProgressIndicator(
-              value: 0.75,
+              value: progress.clamp(0, 1),
               strokeWidth: 9,
               backgroundColor: const Color(0xFFE5DEFF),
               valueColor: const AlwaysStoppedAnimation<Color>(
@@ -351,93 +396,40 @@ class _LoanAction extends StatelessWidget {
   }
 }
 
-class _BottomNav extends StatelessWidget {
-  final VoidCallback? onHomeTap;
-  final VoidCallback? onQrTap;
+class _LoansMessage extends StatelessWidget {
+  final String title;
+  final String? actionLabel;
+  final VoidCallback? onAction;
 
-  const _BottomNav({this.onHomeTap, this.onQrTap, Key? key}) : super(key: key);
+  const _LoansMessage({required this.title, this.actionLabel, this.onAction});
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      top: false,
-      child: Container(
-        height: _bottomNavHeight,
-        margin: const EdgeInsets.fromLTRB(0, 0, 0, 0),
-        decoration: BoxDecoration(
-          color: const Color(0xFF0B0716),
-          borderRadius: BorderRadius.circular(0),
-        ),
-        padding: const EdgeInsets.symmetric(horizontal: 20),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            _BottomNavItem(icon: Icons.home, label: 'Home', onTap: onHomeTap),
-            _BottomNavItem(
-              icon: Icons.grid_view_rounded,
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (_) => const ExplorerPage()),
-                );
-              },
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 18),
+      child: Column(
+        children: [
+          Text(
+            title,
+            textAlign: TextAlign.center,
+            style: const TextStyle(
+              fontSize: 11,
+              color: Color(0xFF5A4AD6),
+              fontWeight: FontWeight.w600,
             ),
-            _BottomNavItem(icon: Icons.qr_code_2_rounded, onTap: onQrTap),
-            const _BottomNavItem(icon: Icons.card_giftcard),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class _BottomNavItem extends StatelessWidget {
-  final IconData icon;
-  final bool active;
-  final String? label;
-  final VoidCallback? onTap;
-
-  const _BottomNavItem({
-    required this.icon,
-    this.active = false,
-    this.label,
-    this.onTap,
-    Key? key,
-  }) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    if (active) {
-      return GestureDetector(
-        onTap: onTap,
-        child: Container(
-          height: 38,
-          padding: const EdgeInsets.symmetric(horizontal: 16),
-          decoration: BoxDecoration(
-            color: const Color(0xFFCFC3FF),
-            borderRadius: BorderRadius.circular(18),
           ),
-          child: Row(
-            children: [
-              Icon(icon, color: const Color(0xFF0B0716), size: 22),
-              const SizedBox(width: 8),
-              Text(
-                label ?? '',
-                style: const TextStyle(
-                  fontSize: 14,
-                  color: Color(0xFF0B0716),
-                  fontWeight: FontWeight.w600,
-                ),
+          if (actionLabel != null && onAction != null) ...[
+            const SizedBox(height: 8),
+            TextButton(
+              onPressed: onAction,
+              style: TextButton.styleFrom(
+                foregroundColor: const Color(0xFF6A5AFF),
               ),
-            ],
-          ),
-        ),
-      );
-    }
-
-    return GestureDetector(
-      onTap: onTap,
-      child: Icon(icon, color: Colors.white, size: 24),
+              child: Text(actionLabel!),
+            ),
+          ],
+        ],
+      ),
     );
   }
 }

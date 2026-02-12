@@ -2,11 +2,8 @@ import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 
-import 'package:onebnpl/screens/explorer.dart';
-import 'package:onebnpl/screens/homepage.dart';
-import 'package:onebnpl/screens/offer.dart';
-
-const double _bottomNavHeight = 80;
+import 'package:onebnpl/app/routes.dart';
+import 'package:onebnpl/widgets/bottom_navigation.dart';
 
 class QrcodePage extends StatefulWidget {
   const QrcodePage({super.key});
@@ -86,7 +83,7 @@ class _QrcodePageState extends State<QrcodePage> {
           ],
         ),
       ),
-      bottomNavigationBar: const _BottomNav(),
+      bottomNavigationBar: const AppBottomNavigation(activeIndex: 2),
     );
   }
 
@@ -216,112 +213,6 @@ class _QrcodePageState extends State<QrcodePage> {
           ],
         );
       },
-    );
-  }
-}
-
-class _BottomNav extends StatelessWidget {
-  const _BottomNav({Key? key}) : super(key: key);
-
-  void _pushInstant(BuildContext context, Widget page) {
-    Navigator.of(context).pushReplacement(
-      PageRouteBuilder(
-        pageBuilder: (_, __, ___) => page,
-        transitionDuration: Duration.zero,
-        reverseTransitionDuration: Duration.zero,
-      ),
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return SafeArea(
-      top: false,
-      child: Container(
-        height: _bottomNavHeight,
-        margin: const EdgeInsets.fromLTRB(0, 0, 0, 0),
-        decoration: BoxDecoration(
-          color: const Color(0xFF0B0716),
-          borderRadius: BorderRadius.circular(0),
-        ),
-        padding: const EdgeInsets.symmetric(horizontal: 20),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            _BottomNavItem(
-              icon: Icons.home,
-              label: 'Home',
-              onTap: () => _pushInstant(context, const Homepage()),
-            ),
-            _BottomNavItem(
-              icon: Icons.grid_view_rounded,
-              onTap: () {
-                _pushInstant(context, const ExplorerPage());
-              },
-            ),
-            const _BottomNavItem(
-              icon: Icons.qr_code_2_rounded,
-              active: true,
-              label: 'QR',
-            ),
-            _BottomNavItem(
-              icon: Icons.card_giftcard,
-              onTap: () => _pushInstant(context, const OfferPage()),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class _BottomNavItem extends StatelessWidget {
-  final IconData icon;
-  final bool active;
-  final String? label;
-  final VoidCallback? onTap;
-
-  const _BottomNavItem({
-    required this.icon,
-    this.active = false,
-    this.label,
-    this.onTap,
-    Key? key,
-  }) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    if (active) {
-      return GestureDetector(
-        onTap: onTap,
-        child: Container(
-          height: 38,
-          padding: const EdgeInsets.symmetric(horizontal: 16),
-          decoration: BoxDecoration(
-            color: const Color(0xFFCFC3FF),
-            borderRadius: BorderRadius.circular(18),
-          ),
-          child: Row(
-            children: [
-              Icon(icon, color: const Color(0xFF0B0716), size: 22),
-              const SizedBox(width: 8),
-              Text(
-                label ?? '',
-                style: const TextStyle(
-                  fontSize: 14,
-                  color: Color(0xFF0B0716),
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            ],
-          ),
-        ),
-      );
-    }
-
-    return GestureDetector(
-      onTap: onTap,
-      child: Icon(icon, color: Colors.white, size: 24),
     );
   }
 }

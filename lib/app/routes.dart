@@ -8,6 +8,7 @@ import 'package:onebnpl/screens/offer.dart';
 import 'package:onebnpl/screens/password.dart';
 import 'package:onebnpl/screens/phonenumberverify.dart';
 import 'package:onebnpl/screens/profilecompleted.dart';
+import 'package:onebnpl/screens/myprofile.dart';
 import 'package:onebnpl/screens/qrcode.dart';
 import 'package:onebnpl/screens/signup.dart';
 import 'package:onebnpl/screens/verificationcode.dart';
@@ -24,6 +25,7 @@ class AppRoutes {
   static const signup = '/signup';
   static const password = '/password';
   static const profileCompleted = '/profile-completed';
+  static const myProfile = '/my-profile';
 }
 
 final Map<String, WidgetBuilder> appRoutes = {
@@ -38,4 +40,5 @@ final Map<String, WidgetBuilder> appRoutes = {
   AppRoutes.signup: (_) => const Signup(),
   AppRoutes.password: (_) => const Password(),
   AppRoutes.profileCompleted: (_) => const Profilecompleted(),
+  AppRoutes.myProfile: (_) => const MyProfilePage(),
 };

@@ -438,21 +438,23 @@ class _PhonenumberverifyState extends State<Phonenumberverify> {
                       Positioned(
                         left: 10,
                         bottom: 55,
-                        child: SizedBox(
-                          width: 190,
-                          height: 130,
-                          child: Stack(
-                            children: [
-                              Positioned(
-                                left: 10,
-                                bottom: 0,
-                                child: Image.asset(
-                                  'assets/images/gigure.png',
-                                  width: 180,
-                                  height: 140,
+                        child: IgnorePointer(
+                          child: SizedBox(
+                            width: 190,
+                            height: 130,
+                            child: Stack(
+                              children: [
+                                Positioned(
+                                  left: 10,
+                                  bottom: 0,
+                                  child: Image.asset(
+                                    'assets/images/gigure.png',
+                                    width: 180,
+                                    height: 140,
+                                  ),
                                 ),
-                              ),
-                            ],
+                              ],
+                            ),
                           ),
                         ),
                       ),
