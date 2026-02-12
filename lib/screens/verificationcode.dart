@@ -232,6 +232,22 @@ class _VerificationcodeState extends State<Verificationcode> {
                                 height: 42,
                                 child: ElevatedButton(
                                   onPressed: () {
+                                    final codeComplete = _controllers.every(
+                                      (controller) =>
+                                          controller.text.trim().isNotEmpty,
+                                    );
+                                    if (!codeComplete) {
+                                      ScaffoldMessenger.of(
+                                        context,
+                                      ).showSnackBar(
+                                        const SnackBar(
+                                          content: Text(
+                                            'Enter the complete 5-digit code to continue.',
+                                          ),
+                                        ),
+                                      );
+                                      return;
+                                    }
                                     Navigator.of(
                                       context,
                                     ).pushNamed(AppRoutes.signup);

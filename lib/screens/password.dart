@@ -182,6 +182,45 @@ class _PasswordState extends State<Password> {
                                 height: 38,
                                 child: ElevatedButton(
                                   onPressed: () {
+                                    final pin = _pinControllers
+                                        .map((controller) => controller.text)
+                                        .join();
+                                    final confirmPin = _confirmControllers
+                                        .map((controller) => controller.text)
+                                        .join();
+                                    final pinComplete = _pinControllers.every(
+                                      (controller) =>
+                                          controller.text.isNotEmpty,
+                                    );
+                                    final confirmComplete = _confirmControllers
+                                        .every(
+                                          (controller) =>
+                                              controller.text.isNotEmpty,
+                                        );
+                                    if (!pinComplete || !confirmComplete) {
+                                      ScaffoldMessenger.of(
+                                        context,
+                                      ).showSnackBar(
+                                        const SnackBar(
+                                          content: Text(
+                                            'Enter and confirm a 6-digit PIN.',
+                                          ),
+                                        ),
+                                      );
+                                      return;
+                                    }
+                                    if (pin != confirmPin) {
+                                      ScaffoldMessenger.of(
+                                        context,
+                                      ).showSnackBar(
+                                        const SnackBar(
+                                          content: Text(
+                                            'PINs do not match. Please try again.',
+                                          ),
+                                        ),
+                                      );
+                                      return;
+                                    }
                                     Navigator.of(
                                       context,
                                     ).pushNamed(AppRoutes.profileCompleted);

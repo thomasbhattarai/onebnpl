@@ -1,5 +1,6 @@
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 
 import 'package:onebnpl/screens/explorer.dart';
 import 'package:onebnpl/screens/homepage.dart';
@@ -17,6 +18,7 @@ class QrcodePage extends StatefulWidget {
 class _QrcodePageState extends State<QrcodePage> {
   CameraController? _controller;
   late final Future<void> _initializeControllerFuture;
+  final ImagePicker _imagePicker = ImagePicker();
 
   @override
   void initState() {
@@ -32,7 +34,7 @@ class _QrcodePageState extends State<QrcodePage> {
       }
       final controller = CameraController(
         cameras.first,
-        ResolutionPreset.high,
+        ResolutionPreset.medium,
         enableAudio: false,
       );
       _controller = controller;
@@ -56,6 +58,19 @@ class _QrcodePageState extends State<QrcodePage> {
     super.dispose();
   }
 
+  Future<void> _pickFromGallery() async {
+    try {
+      await _imagePicker.pickImage(source: ImageSource.gallery);
+    } catch (_) {
+      if (!mounted) {
+        return;
+      }
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Unable to open gallery.')));
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -64,7 +79,9 @@ class _QrcodePageState extends State<QrcodePage> {
       body: SafeArea(
         child: Stack(
           children: [
-            Positioned.fill(child: _buildCameraPreview()),
+            Positioned.fill(
+              child: Image.asset('assets/images/bg.png', fit: BoxFit.cover),
+            ),
             Positioned.fill(child: _buildFrameOverlay()),
           ],
         ),
@@ -77,18 +94,9 @@ class _QrcodePageState extends State<QrcodePage> {
     return FutureBuilder<void>(
       future: _initializeControllerFuture,
       builder: (context, snapshot) {
-        if (_controller == null) {
-          return const Center(
-            child: Text(
-              'Camera unavailable',
-              style: TextStyle(color: Colors.white),
-            ),
-          );
-        }
-        if (snapshot.connectionState != ConnectionState.done) {
-          return const Center(
-            child: CircularProgressIndicator(color: Colors.white),
-          );
+        if (_controller == null ||
+            snapshot.connectionState != ConnectionState.done) {
+          return const ColoredBox(color: Colors.black);
         }
         return CameraPreview(_controller!);
       },
@@ -102,10 +110,11 @@ class _QrcodePageState extends State<QrcodePage> {
         final frameSize = (size.shortestSide * 0.72).clamp(220.0, 320.0);
         final frameTop = (size.height - frameSize) / 2;
         final labelTop = (frameTop - 32).clamp(12.0, size.height);
-        final logoTop = (frameTop + frameSize + 16).clamp(
+        final buttonTop = (frameTop + frameSize + 12).clamp(
           12.0,
-          size.height - 80,
+          size.height - 140,
         );
+        final logoTop = (buttonTop + 56).clamp(12.0, size.height - 80);
 
         return Stack(
           children: [
@@ -124,12 +133,51 @@ class _QrcodePageState extends State<QrcodePage> {
               ),
             ),
             Center(
-              child: Container(
-                width: frameSize,
-                height: frameSize,
-                decoration: BoxDecoration(
-                  border: Border.all(color: Colors.white, width: 2),
-                  borderRadius: BorderRadius.circular(16),
+              child: Stack(
+                alignment: Alignment.center,
+                children: [
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(16),
+                    child: SizedBox(
+                      width: frameSize,
+                      height: frameSize,
+                      child: _buildCameraPreview(),
+                    ),
+                  ),
+                  Container(
+                    width: frameSize,
+                    height: frameSize,
+                    decoration: BoxDecoration(
+                      border: Border.all(color: Colors.white, width: 2),
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Positioned(
+              top: buttonTop,
+              left: 0,
+              right: 0,
+              child: Center(
+                child: SizedBox(
+                  height: 36,
+                  child: ElevatedButton.icon(
+                    onPressed: _pickFromGallery,
+                    icon: const Icon(Icons.photo_library_outlined, size: 18),
+                    label: const Text(
+                      'Choose from gallery',
+                      style: TextStyle(fontSize: 12.5),
+                    ),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFF4E46D9),
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(horizontal: 14),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(18),
+                      ),
+                    ),
+                  ),
                 ),
               ),
             ),

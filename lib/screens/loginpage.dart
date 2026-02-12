@@ -306,6 +306,8 @@ class _LoginpageState extends State<Loginpage> {
                                       keyboardType: TextInputType.phone,
                                       inputFormatters: [
                                         FilteringTextInputFormatter.digitsOnly,
+                                        if (_selectedCountry.code == 'NP')
+                                          LengthLimitingTextInputFormatter(10),
                                       ],
                                     ),
                                   ),
@@ -413,15 +415,20 @@ class _LoginpageState extends State<Loginpage> {
                                   onPressed: () {
                                     final phone = _phoneController.text.trim();
                                     final pin = _pinController.text.trim();
-                                    final phoneValid = phone.length >= 7;
+                                    final phoneValid =
+                                        _selectedCountry.code == 'NP'
+                                        ? phone.length == 10
+                                        : phone.length >= 7;
                                     final pinValid = pin.length == 6;
                                     if (!phoneValid || !pinValid) {
                                       ScaffoldMessenger.of(
                                         context,
                                       ).showSnackBar(
-                                        const SnackBar(
+                                        SnackBar(
                                           content: Text(
-                                            'Enter a valid phone number and 6-digit PIN.',
+                                            _selectedCountry.code == 'NP'
+                                                ? 'Enter a 10-digit Nepal phone number and 6-digit PIN.'
+                                                : 'Enter a valid phone number and 6-digit PIN.',
                                           ),
                                         ),
                                       );

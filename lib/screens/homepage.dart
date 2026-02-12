@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:onebnpl/app/routes.dart';
 import 'package:onebnpl/screens/explorer.dart';
+import 'package:onebnpl/screens/qrcode.dart';
 import 'package:onebnpl/data/finance_summary_data.dart';
 import 'package:onebnpl/data/promo_card_data.dart';
 import 'package:onebnpl/data/top_items_data.dart';
@@ -233,6 +234,14 @@ class Homepage extends StatelessWidget {
                                         child: _ActionButton(
                                           icon: Icons.explore_outlined,
                                           label: 'Explore More',
+                                          onTap: () {
+                                            Navigator.of(context).push(
+                                              MaterialPageRoute(
+                                                builder: (context) =>
+                                                    const ExplorerPage(),
+                                              ),
+                                            );
+                                          },
                                         ),
                                       ),
                                     ],
@@ -431,7 +440,13 @@ class Homepage extends StatelessWidget {
       ),
       bottomNavigationBar: _BottomNav(
         onQrTap: () {
-          Navigator.pushNamed(context, AppRoutes.qrCode);
+          Navigator.of(context).pushReplacement(
+            PageRouteBuilder(
+              pageBuilder: (_, __, ___) => const QrcodePage(),
+              transitionDuration: Duration.zero,
+              reverseTransitionDuration: Duration.zero,
+            ),
+          );
         },
       ),
     );

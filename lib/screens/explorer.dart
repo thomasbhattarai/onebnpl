@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:onebnpl/app/routes.dart';
+import 'package:onebnpl/screens/qrcode.dart';
 import 'package:onebnpl/data/products_data.dart';
 import 'package:onebnpl/data/user_profile_data.dart';
 import 'package:onebnpl/models/product.dart';
@@ -8,8 +9,21 @@ import 'package:onebnpl/models/user_profile.dart';
 
 const double _bottomNavHeight = 80;
 
-class ExplorerPage extends StatelessWidget {
+class ExplorerPage extends StatefulWidget {
   const ExplorerPage({super.key});
+
+  @override
+  State<ExplorerPage> createState() => _ExplorerPageState();
+}
+
+class _ExplorerPageState extends State<ExplorerPage> {
+  final TextEditingController _searchController = TextEditingController();
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -19,6 +33,7 @@ class ExplorerPage extends StatelessWidget {
       _Category(label: 'Vehicle\nAccessories', icon: Icons.directions_car),
       _Category(label: 'View\nMore', icon: Icons.more_horiz),
     ];
+    final query = _searchController.text.trim().toLowerCase();
 
     return Scaffold(
       extendBody: false,
@@ -72,6 +87,7 @@ class ExplorerPage extends StatelessWidget {
                 const SizedBox(height: 10),
                 Expanded(
                   child: Container(
+                    margin: const EdgeInsets.symmetric(horizontal: 16),
                     decoration: BoxDecoration(
                       gradient: const LinearGradient(
                         begin: Alignment.topCenter,
@@ -158,15 +174,27 @@ class ExplorerPage extends StatelessWidget {
                             ),
                             padding: const EdgeInsets.symmetric(horizontal: 12),
                             child: Row(
-                              children: const [
-                                Icon(Icons.search, color: Color(0xFF6F6F6F)),
-                                SizedBox(width: 8),
-                                Text(
-                                  'Search Products',
-                                  style: TextStyle(
-                                    fontSize: 12,
-                                    color: Color(0xFF8E8E8E),
-                                    fontWeight: FontWeight.w500,
+                              children: [
+                                const Icon(
+                                  Icons.search,
+                                  color: Color(0xFF6F6F6F),
+                                ),
+                                const SizedBox(width: 8),
+                                Expanded(
+                                  child: TextField(
+                                    controller: _searchController,
+                                    onChanged: (_) => setState(() {}),
+                                    decoration: const InputDecoration(
+                                      hintText: 'Search Products',
+                                      hintStyle: TextStyle(
+                                        fontSize: 12,
+                                        color: Color(0xFF8E8E8E),
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                      border: InputBorder.none,
+                                      isDense: true,
+                                    ),
+                                    textInputAction: TextInputAction.search,
                                   ),
                                 ),
                               ],
@@ -196,6 +224,19 @@ class ExplorerPage extends StatelessWidget {
                             future: ProductsRepository.fetchProducts(),
                             builder: (context, snapshot) {
                               final items = snapshot.data ?? const <Product>[];
+                              final filteredItems = query.isEmpty
+                                  ? items
+                                  : items
+                                        .where(
+                                          (item) =>
+                                              item.name
+                                                  .toLowerCase()
+                                                  .startsWith(query) ||
+                                              item.specs
+                                                  .toLowerCase()
+                                                  .startsWith(query),
+                                        )
+                                        .toList();
                               if (snapshot.connectionState ==
                                       ConnectionState.waiting &&
                                   items.isEmpty) {
@@ -217,7 +258,7 @@ class ExplorerPage extends StatelessWidget {
                               return GridView.builder(
                                 shrinkWrap: true,
                                 physics: const NeverScrollableScrollPhysics(),
-                                itemCount: items.length,
+                                itemCount: filteredItems.length,
                                 gridDelegate:
                                     const SliverGridDelegateWithFixedCrossAxisCount(
                                       crossAxisCount: 3,
@@ -226,7 +267,9 @@ class ExplorerPage extends StatelessWidget {
                                       childAspectRatio: 0.72,
                                     ),
                                 itemBuilder: (context, index) {
-                                  return _ProductCard(product: items[index]);
+                                  return _ProductCard(
+                                    product: filteredItems[index],
+                                  );
                                 },
                               );
                             },
@@ -247,7 +290,13 @@ class ExplorerPage extends StatelessWidget {
           Navigator.pushReplacementNamed(context, AppRoutes.home);
         },
         onQrTap: () {
-          Navigator.pushNamed(context, AppRoutes.qrCode);
+          Navigator.of(context).pushReplacement(
+            PageRouteBuilder(
+              pageBuilder: (_, __, ___) => const QrcodePage(),
+              transitionDuration: Duration.zero,
+              reverseTransitionDuration: Duration.zero,
+            ),
+          );
         },
         onOfferTap: () {
           Navigator.pushNamed(context, AppRoutes.offer);

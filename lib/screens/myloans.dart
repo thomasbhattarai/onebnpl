@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'package:onebnpl/app/routes.dart';
 import 'package:onebnpl/screens/explorer.dart';
+import 'package:onebnpl/screens/qrcode.dart';
 
 const double _bottomNavHeight = 80;
 
@@ -192,6 +193,15 @@ class MyLoansPage extends StatelessWidget {
       bottomNavigationBar: _BottomNav(
         onHomeTap: () =>
             Navigator.pushReplacementNamed(context, AppRoutes.home),
+        onQrTap: () {
+          Navigator.of(context).pushReplacement(
+            PageRouteBuilder(
+              pageBuilder: (_, __, ___) => const QrcodePage(),
+              transitionDuration: Duration.zero,
+              reverseTransitionDuration: Duration.zero,
+            ),
+          );
+        },
       ),
     );
   }
@@ -343,8 +353,9 @@ class _LoanAction extends StatelessWidget {
 
 class _BottomNav extends StatelessWidget {
   final VoidCallback? onHomeTap;
+  final VoidCallback? onQrTap;
 
-  const _BottomNav({this.onHomeTap, Key? key}) : super(key: key);
+  const _BottomNav({this.onHomeTap, this.onQrTap, Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -371,7 +382,7 @@ class _BottomNav extends StatelessWidget {
                 );
               },
             ),
-            const _BottomNavItem(icon: Icons.qr_code_2_rounded),
+            _BottomNavItem(icon: Icons.qr_code_2_rounded, onTap: onQrTap),
             const _BottomNavItem(icon: Icons.card_giftcard),
           ],
         ),

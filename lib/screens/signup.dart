@@ -320,6 +320,11 @@ class _SignupState extends State<Signup> {
   String? _selectedDistrict;
   String? _selectedGender;
   late Country _selectedCountry;
+  final TextEditingController _firstNameController = TextEditingController();
+  final TextEditingController _middleNameController = TextEditingController();
+  final TextEditingController _lastNameController = TextEditingController();
+  final TextEditingController _addressController = TextEditingController();
+  final TextEditingController _emailController = TextEditingController();
 
   @override
   void initState() {
@@ -328,6 +333,16 @@ class _SignupState extends State<Signup> {
       (country) => country.code == 'NP',
       orElse: () => _countries.first,
     );
+  }
+
+  @override
+  void dispose() {
+    _firstNameController.dispose();
+    _middleNameController.dispose();
+    _lastNameController.dispose();
+    _addressController.dispose();
+    _emailController.dispose();
+    super.dispose();
   }
 
   @override
@@ -475,11 +490,20 @@ class _SignupState extends State<Signup> {
                             ),
                             const SizedBox(height: 6),
 
-                            const LabeledInput(label: 'First Name :'),
+                            LabeledInput(
+                              label: 'First Name :',
+                              controller: _firstNameController,
+                            ),
                             const SizedBox(height: 6),
-                            const LabeledInput(label: 'Middle Name :'),
+                            LabeledInput(
+                              label: 'Middle Name :',
+                              controller: _middleNameController,
+                            ),
                             const SizedBox(height: 6),
-                            const LabeledInput(label: 'Last Name :'),
+                            LabeledInput(
+                              label: 'Last Name :',
+                              controller: _lastNameController,
+                            ),
                             const SizedBox(height: 6),
 
                             const Text(
@@ -558,7 +582,10 @@ class _SignupState extends State<Signup> {
                                 },
                               )
                             else
-                              const LabeledInput(label: 'Address :'),
+                              LabeledInput(
+                                label: 'Address :',
+                                controller: _addressController,
+                              ),
                             const SizedBox(height: 6),
                             if (_selectedCountry.name == 'Nepal')
                               LabeledDropdown(
@@ -582,7 +609,10 @@ class _SignupState extends State<Signup> {
                             else
                               const SizedBox.shrink(),
                             const SizedBox(height: 6),
-                            const LabeledInput(label: 'Email :'),
+                            LabeledInput(
+                              label: 'Email :',
+                              controller: _emailController,
+                            ),
 
                             const SizedBox(height: 20),
 
@@ -593,6 +623,38 @@ class _SignupState extends State<Signup> {
                                 height: 32,
                                 child: ElevatedButton(
                                   onPressed: () {
+                                    final firstName = _firstNameController.text
+                                        .trim();
+                                    final lastName = _lastNameController.text
+                                        .trim();
+                                    final email = _emailController.text.trim();
+                                    final isNepal =
+                                        _selectedCountry.name == 'Nepal';
+                                    final address = _addressController.text
+                                        .trim();
+                                    final missingRequiredText =
+                                        firstName.isEmpty ||
+                                        lastName.isEmpty ||
+                                        email.isEmpty ||
+                                        (!isNepal && address.isEmpty);
+                                    final missingSelection =
+                                        _selectedGender == null ||
+                                        (isNepal &&
+                                            (_selectedProvince == null ||
+                                                _selectedDistrict == null));
+                                    if (missingRequiredText ||
+                                        missingSelection) {
+                                      ScaffoldMessenger.of(
+                                        context,
+                                      ).showSnackBar(
+                                        const SnackBar(
+                                          content: Text(
+                                            'Please fill all required fields to continue.',
+                                          ),
+                                        ),
+                                      );
+                                      return;
+                                    }
                                     Navigator.of(
                                       context,
                                     ).pushNamed(AppRoutes.password);
@@ -666,8 +728,9 @@ class _SignupState extends State<Signup> {
 
 class LabeledInput extends StatelessWidget {
   final String label;
+  final TextEditingController? controller;
 
-  const LabeledInput({super.key, required this.label});
+  const LabeledInput({super.key, required this.label, this.controller});
 
   @override
   Widget build(BuildContext context) {
@@ -696,11 +759,12 @@ class LabeledInput extends StatelessWidget {
               ),
             ],
           ),
-          child: const TextField(
+          child: TextField(
+            controller: controller,
             textAlign: TextAlign.start,
             textAlignVertical: TextAlignVertical.center,
-            style: TextStyle(fontSize: 12, height: 1.2),
-            decoration: InputDecoration(
+            style: const TextStyle(fontSize: 12, height: 1.2),
+            decoration: const InputDecoration(
               isDense: true,
               border: InputBorder.none,
               contentPadding: EdgeInsets.symmetric(horizontal: 18, vertical: 9),

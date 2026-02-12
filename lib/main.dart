@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:onebnpl/app/routes.dart';
+import 'package:onebnpl/screens/connectivity.dart';
 
 void main() {
   runApp(const MyApp());
@@ -13,7 +14,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      initialRoute: AppRoutes.login,
+      home: const ConnectivityGate(),
       routes: appRoutes,
     );
   }

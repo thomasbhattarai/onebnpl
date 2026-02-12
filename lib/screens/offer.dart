@@ -6,6 +6,7 @@ import 'package:onebnpl/data/user_profile_data.dart';
 import 'package:onebnpl/models/offer.dart';
 import 'package:onebnpl/models/user_profile.dart';
 import 'package:onebnpl/screens/explorer.dart';
+import 'package:onebnpl/screens/qrcode.dart';
 
 class OfferPage extends StatelessWidget {
   const OfferPage({super.key});
@@ -238,8 +239,15 @@ class OfferPage extends StatelessWidget {
       bottomNavigationBar: _BottomNav(
         onHomeTap: () =>
             Navigator.pushReplacementNamed(context, AppRoutes.home),
-        onQrTap: () =>
-            Navigator.pushReplacementNamed(context, AppRoutes.qrCode),
+        onQrTap: () {
+          Navigator.of(context).pushReplacement(
+            PageRouteBuilder(
+              pageBuilder: (_, __, ___) => const QrcodePage(),
+              transitionDuration: Duration.zero,
+              reverseTransitionDuration: Duration.zero,
+            ),
+          );
+        },
       ),
     );
   }

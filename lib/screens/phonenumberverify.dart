@@ -1,5 +1,6 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 import 'package:onebnpl/app/routes.dart';
 import 'package:onebnpl/widgets/phone_country_data.dart';
@@ -13,6 +14,8 @@ class Phonenumberverify extends StatefulWidget {
 
 class _PhonenumberverifyState extends State<Phonenumberverify> {
   late Country _selectedCountry;
+  final TextEditingController _phoneController = TextEditingController();
+  final TextEditingController _emailController = TextEditingController();
 
   @override
   void initState() {
@@ -21,6 +24,13 @@ class _PhonenumberverifyState extends State<Phonenumberverify> {
       (country) => country.code == 'NP',
       orElse: () => phoneCountries.first,
     );
+  }
+
+  @override
+  void dispose() {
+    _phoneController.dispose();
+    _emailController.dispose();
+    super.dispose();
   }
 
   @override
@@ -213,6 +223,7 @@ class _PhonenumberverifyState extends State<Phonenumberverify> {
                                   ),
                                   Expanded(
                                     child: TextField(
+                                      controller: _phoneController,
                                       decoration: const InputDecoration(
                                         hintText: "",
                                         hintStyle: TextStyle(
@@ -226,6 +237,11 @@ class _PhonenumberverifyState extends State<Phonenumberverify> {
                                         ),
                                       ),
                                       keyboardType: TextInputType.phone,
+                                      inputFormatters: [
+                                        FilteringTextInputFormatter.digitsOnly,
+                                        if (_selectedCountry.code == 'NP')
+                                          LengthLimitingTextInputFormatter(10),
+                                      ],
                                     ),
                                   ),
                                 ],
@@ -286,8 +302,9 @@ class _PhonenumberverifyState extends State<Phonenumberverify> {
                                   ),
                                 ],
                               ),
-                              child: const TextField(
-                                decoration: InputDecoration(
+                              child: TextField(
+                                controller: _emailController,
+                                decoration: const InputDecoration(
                                   hintText: "",
                                   hintStyle: TextStyle(
                                     fontSize: 12.5,
@@ -312,6 +329,44 @@ class _PhonenumberverifyState extends State<Phonenumberverify> {
                                 height: 42,
                                 child: ElevatedButton(
                                   onPressed: () {
+                                    final phone = _phoneController.text.trim();
+                                    final email = _emailController.text.trim();
+                                    if (phone.isEmpty && email.isEmpty) {
+                                      ScaffoldMessenger.of(
+                                        context,
+                                      ).showSnackBar(
+                                        const SnackBar(
+                                          content: Text(
+                                            'Enter a phone number or an email to continue.',
+                                          ),
+                                        ),
+                                      );
+                                      return;
+                                    }
+                                    final phoneValid = phone.isEmpty
+                                        ? true
+                                        : _selectedCountry.code == 'NP'
+                                        ? phone.length == 10
+                                        : phone.length >= 7;
+                                    final emailValid = email.isEmpty
+                                        ? true
+                                        : RegExp(
+                                            r'^[^@\s]+@[^@\s]+\.[^@\s]+$',
+                                          ).hasMatch(email);
+                                    if (!phoneValid || !emailValid) {
+                                      ScaffoldMessenger.of(
+                                        context,
+                                      ).showSnackBar(
+                                        SnackBar(
+                                          content: Text(
+                                            _selectedCountry.code == 'NP'
+                                                ? 'Enter a 10-digit Nepal phone number or a valid email.'
+                                                : 'Enter a valid phone number or a valid email.',
+                                          ),
+                                        ),
+                                      );
+                                      return;
+                                    }
                                     Navigator.of(
                                       context,
                                     ).pushNamed(AppRoutes.verificationCode);
