@@ -1,8 +1,8 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-
 import 'package:onebnpl/app/routes.dart';
+import 'package:onebnpl/services/auth_service.dart';
 import 'package:onebnpl/widgets/phone_country_data.dart';
 
 class Loginpage extends StatefulWidget {
@@ -18,6 +18,8 @@ class _LoginpageState extends State<Loginpage> {
   final TextEditingController _pinController = TextEditingController();
   final FocusNode _phoneFocusNode = FocusNode();
   final FocusNode _pinFocusNode = FocusNode();
+  final AuthService _authService = AuthService();
+  bool _isLoading = false;
 
   @override
   void initState() {
@@ -532,33 +534,63 @@ class _LoginpageState extends State<Loginpage> {
                                 width: 200,
                                 height: 42,
                                 child: ElevatedButton(
-                                  onPressed: () {
-                                    final phone = _phoneController.text.trim();
-                                    final pin = _pinController.text.trim();
-                                    final phoneValid =
-                                        _selectedCountry.code == 'NP'
-                                        ? phone.length == 10
-                                        : phone.length >= 7;
-                                    final pinValid = pin.length == 6;
-                                    if (!phoneValid || !pinValid) {
-                                      ScaffoldMessenger.of(
-                                        context,
-                                      ).showSnackBar(
-                                        SnackBar(
-                                          content: Text(
-                                            _selectedCountry.code == 'NP'
-                                                ? 'Enter a 10-digit Nepal phone number and 6-digit PIN.'
-                                                : 'Enter a valid phone number and 6-digit PIN.',
-                                          ),
-                                        ),
-                                      );
-                                      return;
-                                    }
+                                  onPressed: _isLoading
+                                      ? null
+                                      : () async {
+                                          final phone = _phoneController.text
+                                              .trim();
+                                          final pin = _pinController.text
+                                              .trim();
+                                          final phoneValid =
+                                              _selectedCountry.code == 'NP'
+                                              ? phone.length == 10
+                                              : phone.length >= 7;
+                                          final pinValid = pin.length == 6;
+                                          if (!phoneValid || !pinValid) {
+                                            ScaffoldMessenger.of(
+                                              context,
+                                            ).showSnackBar(
+                                              SnackBar(
+                                                content: Text(
+                                                  _selectedCountry.code == 'NP'
+                                                      ? 'Enter a 10-digit Nepal phone number and 6-digit PIN.'
+                                                      : 'Enter a valid phone number and 6-digit PIN.',
+                                                ),
+                                              ),
+                                            );
+                                            return;
+                                          }
 
-                                    Navigator.of(
-                                      context,
-                                    ).pushReplacementNamed(AppRoutes.home);
-                                  },
+                                          setState(() => _isLoading = true);
+                                          final result = await _authService
+                                              .login(
+                                                phoneNumber: phone,
+                                                password: pin,
+                                              );
+                                          setState(() => _isLoading = false);
+
+                                          if (!context.mounted) return;
+
+                                          if (result['success']) {
+                                            Navigator.of(
+                                              context,
+                                            ).pushReplacementNamed(
+                                              AppRoutes.home,
+                                            );
+                                          } else {
+                                            ScaffoldMessenger.of(
+                                              context,
+                                            ).showSnackBar(
+                                              SnackBar(
+                                                content: Text(
+                                                  result['message'] ??
+                                                      'Login failed',
+                                                ),
+                                                backgroundColor: Colors.red,
+                                              ),
+                                            );
+                                          }
+                                        },
                                   style: ElevatedButton.styleFrom(
                                     backgroundColor: const Color(0xFF4E46D9),
                                     elevation: 0,

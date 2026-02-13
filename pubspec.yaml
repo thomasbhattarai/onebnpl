@@ -39,6 +39,10 @@ dependencies:
   connectivity_plus: ^6.0.3
   app_settings: ^5.1.1
   http: ^1.2.2
+  sqlite3: ^2.2.8
+  sqlite3_flutter_libs: ^0.5.26
+  path_provider: ^2.1.1
+  dio: ^5.4.0
 
 dev_dependencies:
   flutter_test:

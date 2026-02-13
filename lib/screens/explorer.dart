@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-
-import 'package:onebnpl/app/routes.dart';
 import 'package:onebnpl/data/products_data.dart';
 import 'package:onebnpl/data/user_profile_data.dart';
 import 'package:onebnpl/models/product.dart';
@@ -36,20 +34,13 @@ class _ExplorerPageState extends State<ExplorerPage> {
 
     return Scaffold(
       extendBody: false,
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        toolbarHeight: 0,
-        systemOverlayStyle: SystemUiOverlayStyle.light,
-      ),
-      body: Stack(
-        children: [
-          Positioned.fill(
-            child: Image.asset('assets/images/bg.png', fit: BoxFit.cover),
-          ),
-          SafeArea(
-            top: false,
-            child: Column(
+      body: SafeArea(
+        child: Stack(
+          children: [
+            Positioned.fill(
+              child: Image.asset('assets/images/bg.png', fit: BoxFit.cover),
+            ),
+            Column(
               children: [
                 Padding(
                   padding: const EdgeInsets.fromLTRB(16, 10, 16, 0),
@@ -288,8 +279,8 @@ class _ExplorerPageState extends State<ExplorerPage> {
                 ),
               ],
             ),
-          ),
-        ],
+          ],
+        ),
       ),
       bottomNavigationBar: const AppBottomNavigation(activeIndex: 1),
     );

@@ -2,6 +2,7 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:onebnpl/app/routes.dart';
+import 'package:onebnpl/services/auth_service.dart';
 
 class Verificationcode extends StatefulWidget {
   const Verificationcode({super.key});
@@ -11,20 +12,29 @@ class Verificationcode extends StatefulWidget {
 }
 
 class _VerificationcodeState extends State<Verificationcode> {
-  final List<TextEditingController> _controllers = List.generate(
-    5,
-    (_) => TextEditingController(),
-  );
-  final List<FocusNode> _focusNodes = List.generate(5, (_) => FocusNode());
+  late String _phoneNumber;
+  late String _fullName;
+
+  final TextEditingController _pinController = TextEditingController();
+  final FocusNode _pinFocusNode = FocusNode();
+  final AuthService _authService = AuthService();
+  bool _isLoading = false;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final args =
+        ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
+    if (args != null) {
+      _phoneNumber = args['phone'] ?? '';
+      _fullName = args['fullName'] ?? '';
+    }
+  }
 
   @override
   void dispose() {
-    for (final controller in _controllers) {
-      controller.dispose();
-    }
-    for (final node in _focusNodes) {
-      node.dispose();
-    }
+    _pinController.dispose();
+    _pinFocusNode.dispose();
     super.dispose();
   }
 
@@ -39,12 +49,12 @@ class _VerificationcodeState extends State<Verificationcode> {
               child: Image.asset('assets/images/bg.png', fit: BoxFit.cover),
             ),
 
-            // Top left sign in
+            // Top left sign up
             const Positioned(
               top: 175,
               left: 18,
               child: Text(
-                'Sign In',
+                'Create PIN',
                 style: TextStyle(
                   fontSize: 14,
                   color: Colors.white,
@@ -145,7 +155,7 @@ class _VerificationcodeState extends State<Verificationcode> {
                             const SizedBox(height: 40),
 
                             const Text(
-                              'Verify your Mobile Number',
+                              'Create Your PIN',
                               textAlign: TextAlign.center,
                               style: TextStyle(
                                 fontSize: 14,
@@ -155,7 +165,7 @@ class _VerificationcodeState extends State<Verificationcode> {
                             ),
                             const SizedBox(height: 4),
                             const Text(
-                              'We just sent a 5-digit code to your mobile number.\nEnter it below.',
+                              'Enter a 6-digit PIN for your account security.',
                               textAlign: TextAlign.center,
                               style: TextStyle(
                                 fontSize: 11.5,
@@ -165,93 +175,178 @@ class _VerificationcodeState extends State<Verificationcode> {
                             ),
                             const SizedBox(height: 18),
 
-                            // OTP boxes
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: List.generate(5, (index) {
-                                return Padding(
-                                  padding: EdgeInsets.only(
-                                    right: index == 4 ? 0 : 8,
-                                  ),
-                                  child: SizedBox(
-                                    width: 48,
-                                    height: 48,
-                                    child: TextField(
-                                      controller: _controllers[index],
-                                      focusNode: _focusNodes[index],
-                                      keyboardType: TextInputType.number,
-                                      textAlign: TextAlign.center,
-                                      maxLength: 1,
-                                      inputFormatters: [
-                                        FilteringTextInputFormatter.digitsOnly,
-                                      ],
-                                      decoration: InputDecoration(
-                                        counterText: '',
-                                        filled: true,
-                                        fillColor: Colors.white,
-                                        enabledBorder: OutlineInputBorder(
-                                          borderRadius: BorderRadius.circular(
-                                            8,
-                                          ),
-                                          borderSide: const BorderSide(
-                                            color: Color(0xFF8E83E8),
-                                            width: 1,
-                                          ),
-                                        ),
-                                        focusedBorder: OutlineInputBorder(
-                                          borderRadius: BorderRadius.circular(
-                                            8,
-                                          ),
-                                          borderSide: const BorderSide(
-                                            color: Color(0xFF4E46D9),
-                                            width: 1.5,
-                                          ),
-                                        ),
-                                      ),
-                                      onChanged: (value) {
-                                        if (value.isNotEmpty) {
-                                          if (index < _focusNodes.length - 1) {
-                                            _focusNodes[index + 1]
-                                                .requestFocus();
-                                          } else {
-                                            _focusNodes[index].unfocus();
-                                          }
-                                        }
-                                      },
+                            // PIN input field
+                            GestureDetector(
+                              behavior: HitTestBehavior.opaque,
+                              onTap: () => _pinFocusNode.requestFocus(),
+                              child: Container(
+                                height: 54,
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.circular(12),
+                                  boxShadow: const [
+                                    BoxShadow(
+                                      color: Color(0x3D6C63C8),
+                                      blurRadius: 8,
+                                      offset: Offset(0, 3),
                                     ),
-                                  ),
-                                );
-                              }),
+                                  ],
+                                ),
+                                child: Stack(
+                                  alignment: Alignment.center,
+                                  children: [
+                                    Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 16,
+                                      ),
+                                      child: Row(
+                                        children: List.generate(6, (index) {
+                                          final text = _pinController.text;
+                                          final showCaret =
+                                              _pinFocusNode.hasFocus &&
+                                              text.length < 6 &&
+                                              index == text.length;
+                                          final char = index < text.length
+                                              ? text[index]
+                                              : (showCaret ? '' : '_');
+                                          return Expanded(
+                                            child: Stack(
+                                              alignment: Alignment.center,
+                                              children: [
+                                                Text(
+                                                  char,
+                                                  textAlign: TextAlign.center,
+                                                  style: const TextStyle(
+                                                    fontSize: 18,
+                                                    color: Color(0xFF6F6F6F),
+                                                    fontWeight: FontWeight.w600,
+                                                  ),
+                                                ),
+                                                if (showCaret)
+                                                  Container(
+                                                    width: 2,
+                                                    height: 20,
+                                                    decoration: BoxDecoration(
+                                                      color: const Color(
+                                                        0xFF4E46D9,
+                                                      ),
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                            2,
+                                                          ),
+                                                    ),
+                                                  ),
+                                              ],
+                                            ),
+                                          );
+                                        }),
+                                      ),
+                                    ),
+                                    Positioned.fill(
+                                      child: TextField(
+                                        controller: _pinController,
+                                        focusNode: _pinFocusNode,
+                                        keyboardType: TextInputType.number,
+                                        textAlign: TextAlign.start,
+                                        textAlignVertical:
+                                            TextAlignVertical.center,
+                                        maxLength: 6,
+                                        inputFormatters: [
+                                          FilteringTextInputFormatter
+                                              .digitsOnly,
+                                        ],
+                                        style: const TextStyle(
+                                          fontSize: 18,
+                                          color: Colors.transparent,
+                                          letterSpacing: 18,
+                                          fontWeight: FontWeight.w600,
+                                        ),
+                                        showCursor: false,
+                                        cursorColor: const Color(0xFF4E46D9),
+                                        decoration: const InputDecoration(
+                                          counterText: '',
+                                          border: InputBorder.none,
+                                          contentPadding: EdgeInsets.symmetric(
+                                            horizontal: 16,
+                                            vertical: 12,
+                                          ),
+                                        ),
+                                        onChanged: (_) => setState(() {}),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
                             ),
-                            const SizedBox(height: 18),
+                            const SizedBox(height: 28),
 
+                            // Sign up button
                             Align(
-                              alignment: Alignment.center,
+                              alignment: Alignment.centerRight,
                               child: SizedBox(
                                 width: 220,
                                 height: 42,
                                 child: ElevatedButton(
-                                  onPressed: () {
-                                    final codeComplete = _controllers.every(
-                                      (controller) =>
-                                          controller.text.trim().isNotEmpty,
-                                    );
-                                    if (!codeComplete) {
-                                      ScaffoldMessenger.of(
-                                        context,
-                                      ).showSnackBar(
-                                        const SnackBar(
-                                          content: Text(
-                                            'Enter the complete 5-digit code to continue.',
-                                          ),
-                                        ),
-                                      );
-                                      return;
-                                    }
-                                    Navigator.of(
-                                      context,
-                                    ).pushNamed(AppRoutes.signup);
-                                  },
+                                  onPressed: _isLoading
+                                      ? null
+                                      : () async {
+                                          final pin = _pinController.text
+                                              .trim();
+                                          if (pin.length != 6) {
+                                            ScaffoldMessenger.of(
+                                              context,
+                                            ).showSnackBar(
+                                              const SnackBar(
+                                                content: Text(
+                                                  'Enter a 6-digit PIN to continue.',
+                                                ),
+                                              ),
+                                            );
+                                            return;
+                                          }
+
+                                          setState(() => _isLoading = true);
+                                          try {
+                                            await _authService.signup(
+                                              fullName: _fullName,
+                                              phoneNumber: _phoneNumber,
+                                              password: pin,
+                                            );
+
+                                            if (!mounted) return;
+
+                                            ScaffoldMessenger.of(
+                                              context,
+                                            ).showSnackBar(
+                                              const SnackBar(
+                                                content: Text(
+                                                  'Sign up successful! Please log in.',
+                                                ),
+                                                backgroundColor: Colors.green,
+                                              ),
+                                            );
+
+                                            Navigator.of(
+                                              context,
+                                            ).pushReplacementNamed(
+                                              AppRoutes.login,
+                                            );
+                                          } catch (e) {
+                                            setState(() => _isLoading = false);
+                                            if (!mounted) return;
+
+                                            ScaffoldMessenger.of(
+                                              context,
+                                            ).showSnackBar(
+                                              SnackBar(
+                                                content: Text(
+                                                  'Sign up failed: ${e.toString()}',
+                                                ),
+                                                backgroundColor: Colors.red,
+                                              ),
+                                            );
+                                          }
+                                        },
                                   style: ElevatedButton.styleFrom(
                                     backgroundColor: const Color(0xFF4E46D9),
                                     elevation: 0,
@@ -259,14 +354,26 @@ class _VerificationcodeState extends State<Verificationcode> {
                                       borderRadius: BorderRadius.circular(11),
                                     ),
                                   ),
-                                  child: const Text(
-                                    'Verify',
-                                    style: TextStyle(
-                                      fontSize: 13.5,
-                                      fontWeight: FontWeight.w600,
-                                      color: Colors.white,
-                                    ),
-                                  ),
+                                  child: _isLoading
+                                      ? const SizedBox(
+                                          height: 20,
+                                          width: 20,
+                                          child: CircularProgressIndicator(
+                                            strokeWidth: 2,
+                                            valueColor:
+                                                AlwaysStoppedAnimation<Color>(
+                                                  Colors.white,
+                                                ),
+                                          ),
+                                        )
+                                      : const Text(
+                                          'Sign Up',
+                                          style: TextStyle(
+                                            fontSize: 13.5,
+                                            fontWeight: FontWeight.w600,
+                                            color: Colors.white,
+                                          ),
+                                        ),
                                 ),
                               ),
                             ),
@@ -291,7 +398,11 @@ class _VerificationcodeState extends State<Verificationcode> {
                                       fontWeight: FontWeight.w700,
                                     ),
                                     recognizer: TapGestureRecognizer()
-                                      ..onTap = () {},
+                                      ..onTap = () {
+                                        Navigator.of(
+                                          context,
+                                        ).pushReplacementNamed(AppRoutes.login);
+                                      },
                                   ),
                                 ],
                               ),
@@ -313,7 +424,7 @@ class _VerificationcodeState extends State<Verificationcode> {
                                         'By Creating this account you agree with our ',
                                   ),
                                   TextSpan(
-                                    text: 'Terms and onditions',
+                                    text: 'Terms and Conditions',
                                     style: const TextStyle(
                                       color: Color(0xFFE53935),
                                       fontWeight: FontWeight.w600,

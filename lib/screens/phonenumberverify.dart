@@ -15,7 +15,7 @@ class Phonenumberverify extends StatefulWidget {
 class _PhonenumberverifyState extends State<Phonenumberverify> {
   late Country _selectedCountry;
   final TextEditingController _phoneController = TextEditingController();
-  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _fullNameController = TextEditingController();
 
   @override
   void initState() {
@@ -29,7 +29,7 @@ class _PhonenumberverifyState extends State<Phonenumberverify> {
   @override
   void dispose() {
     _phoneController.dispose();
-    _emailController.dispose();
+    _fullNameController.dispose();
     super.dispose();
   }
 
@@ -279,7 +279,7 @@ class _PhonenumberverifyState extends State<Phonenumberverify> {
                             const SizedBox(height: 14),
 
                             const Text(
-                              "Enter Your Email :",
+                              "Full Name :",
                               style: TextStyle(
                                 fontSize: 12,
                                 color: Color(0xFF4C3EA6),
@@ -288,7 +288,7 @@ class _PhonenumberverifyState extends State<Phonenumberverify> {
                             ),
                             const SizedBox(height: 8),
 
-                            // Email input
+                            // Full name input
                             Container(
                               height: 44,
                               decoration: BoxDecoration(
@@ -303,9 +303,9 @@ class _PhonenumberverifyState extends State<Phonenumberverify> {
                                 ],
                               ),
                               child: TextField(
-                                controller: _emailController,
+                                controller: _fullNameController,
                                 decoration: const InputDecoration(
-                                  hintText: "",
+                                  hintText: "Enter your full name",
                                   hintStyle: TextStyle(
                                     fontSize: 12.5,
                                     color: Color(0xFF6F6F6F),
@@ -316,7 +316,7 @@ class _PhonenumberverifyState extends State<Phonenumberverify> {
                                     vertical: 12,
                                   ),
                                 ),
-                                keyboardType: TextInputType.emailAddress,
+                                keyboardType: TextInputType.name,
                               ),
                             ),
                             const SizedBox(height: 20),
@@ -330,46 +330,45 @@ class _PhonenumberverifyState extends State<Phonenumberverify> {
                                 child: ElevatedButton(
                                   onPressed: () {
                                     final phone = _phoneController.text.trim();
-                                    final email = _emailController.text.trim();
-                                    if (phone.isEmpty && email.isEmpty) {
+                                    final fullName = _fullNameController.text
+                                        .trim();
+                                    if (phone.isEmpty || fullName.isEmpty) {
                                       ScaffoldMessenger.of(
                                         context,
                                       ).showSnackBar(
                                         const SnackBar(
                                           content: Text(
-                                            'Enter a phone number or an email to continue.',
+                                            'Enter phone number and full name to continue.',
                                           ),
                                         ),
                                       );
                                       return;
                                     }
-                                    final phoneValid = phone.isEmpty
-                                        ? true
-                                        : _selectedCountry.code == 'NP'
+                                    final phoneValid =
+                                        _selectedCountry.code == 'NP'
                                         ? phone.length == 10
                                         : phone.length >= 7;
-                                    final emailValid = email.isEmpty
-                                        ? true
-                                        : RegExp(
-                                            r'^[^@\s]+@[^@\s]+\.[^@\s]+$',
-                                          ).hasMatch(email);
-                                    if (!phoneValid || !emailValid) {
+                                    if (!phoneValid) {
                                       ScaffoldMessenger.of(
                                         context,
                                       ).showSnackBar(
                                         SnackBar(
                                           content: Text(
                                             _selectedCountry.code == 'NP'
-                                                ? 'Enter a 10-digit Nepal phone number or a valid email.'
-                                                : 'Enter a valid phone number or a valid email.',
+                                                ? 'Enter a 10-digit Nepal phone number.'
+                                                : 'Enter a valid phone number.',
                                           ),
                                         ),
                                       );
                                       return;
                                     }
-                                    Navigator.of(
-                                      context,
-                                    ).pushNamed(AppRoutes.verificationCode);
+                                    Navigator.of(context).pushNamed(
+                                      AppRoutes.verificationCode,
+                                      arguments: {
+                                        'phone': phone,
+                                        'fullName': fullName,
+                                      },
+                                    );
                                   },
                                   style: ElevatedButton.styleFrom(
                                     backgroundColor: const Color(0xFF4E46D9),
