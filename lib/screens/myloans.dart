@@ -6,6 +6,7 @@ import 'package:onebnpl/data/loans_data.dart';
 import 'package:onebnpl/models/loan.dart';
 import 'package:onebnpl/services/loan_service.dart';
 import 'package:onebnpl/widgets/bottom_navigation.dart';
+import 'myloandetails.dart';
 
 class MyLoansPage extends StatefulWidget {
   const MyLoansPage({super.key});
@@ -316,7 +317,16 @@ class _LoanCard extends StatelessWidget {
                 const SizedBox(height: 8),
                 Row(
                   children: [
-                    _LoanAction(label: 'Details'),
+                    _LoanAction(
+                      label: 'Details',
+                      onTap: () {
+                        Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (context) => const MyLoanDetailsPage(),
+                          ),
+                        );
+                      },
+                    ),
                     const SizedBox(width: 8),
                     _LoanAction(label: 'Pay Now'),
                   ],
@@ -374,23 +384,27 @@ class _LoanDial extends StatelessWidget {
 
 class _LoanAction extends StatelessWidget {
   final String label;
+  final VoidCallback? onTap;
 
-  const _LoanAction({required this.label});
+  const _LoanAction({required this.label, this.onTap});
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-      decoration: BoxDecoration(
-        color: const Color(0xFFD9D0FF),
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Text(
-        label,
-        style: const TextStyle(
-          fontSize: 10,
-          color: Color(0xFF4A3BC9),
-          fontWeight: FontWeight.w600,
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+        decoration: BoxDecoration(
+          color: const Color(0xFFD9D0FF),
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Text(
+          label,
+          style: const TextStyle(
+            fontSize: 10,
+            color: Color(0xFF4A3BC9),
+            fontWeight: FontWeight.w600,
+          ),
         ),
       ),
     );

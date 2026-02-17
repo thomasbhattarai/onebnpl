@@ -7,7 +7,7 @@ class ProductsRepository {
       Product(
         name: 'Dell Inspiron 3501',
         specs: 'Intel Core i3 11th Gen\n8GB RAM | 256GB SSD',
-        price: 'Rs 5,000',
+        price: 'Rs 50,000',
         imagePath: 'assets/images/dell.png',
       ),
       Product(

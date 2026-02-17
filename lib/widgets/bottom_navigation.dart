@@ -10,24 +10,28 @@ const double bottomNavHeight = 80;
 
 class AppBottomNavigation extends StatelessWidget {
   final int activeIndex;
+  final bool iconsOnly;
 
-  const AppBottomNavigation({required this.activeIndex, Key? key})
-    : super(key: key);
+  const AppBottomNavigation({
+    required this.activeIndex,
+    this.iconsOnly = false,
+    Key? key,
+  }) : super(key: key);
 
   static Widget _getPageForRoute(String routeName) {
     switch (routeName) {
       case AppRoutes.home:
-        return const Homepage();
+        return Homepage();
       case AppRoutes.explorer:
-        return const ExplorerPage();
+        return ExplorerPage();
       case AppRoutes.qrCode:
-        return const QrcodePage();
+        return QrcodePage();
       case AppRoutes.offer:
-        return const OfferPage();
+        return OfferPage();
       case AppRoutes.myProfile:
-        return const MyProfilePage();
+        return MyProfilePage();
       default:
-        return const Homepage();
+        return Homepage();
     }
   }
 
@@ -129,6 +133,7 @@ class AppBottomNavigation extends StatelessWidget {
               onTap: activeIndex == 0
                   ? null
                   : () => navigateWithTransition(context, AppRoutes.home),
+              iconsOnly: iconsOnly,
             ),
             _BottomNavItem(
               icon: Icons.grid_view_rounded,
@@ -137,6 +142,7 @@ class AppBottomNavigation extends StatelessWidget {
               onTap: activeIndex == 1
                   ? null
                   : () => navigateWithTransition(context, AppRoutes.explorer),
+              iconsOnly: iconsOnly,
             ),
             _BottomNavItem(
               icon: Icons.qr_code_2_rounded,
@@ -145,6 +151,7 @@ class AppBottomNavigation extends StatelessWidget {
               onTap: activeIndex == 2
                   ? null
                   : () => navigateWithTransition(context, AppRoutes.qrCode),
+              iconsOnly: iconsOnly,
             ),
             _BottomNavItem(
               icon: Icons.card_giftcard,
@@ -153,6 +160,7 @@ class AppBottomNavigation extends StatelessWidget {
               onTap: activeIndex == 3
                   ? null
                   : () => navigateWithTransition(context, AppRoutes.offer),
+              iconsOnly: iconsOnly,
             ),
             _BottomNavItem(
               icon: Icons.person_outline,
@@ -161,6 +169,7 @@ class AppBottomNavigation extends StatelessWidget {
               onTap: activeIndex == 4
                   ? null
                   : () => navigateWithTransition(context, AppRoutes.myProfile),
+              iconsOnly: iconsOnly,
             ),
           ],
         ),
@@ -174,17 +183,29 @@ class _BottomNavItem extends StatelessWidget {
   final bool active;
   final String? label;
   final VoidCallback? onTap;
+  final bool iconsOnly;
 
   const _BottomNavItem({
     required this.icon,
     this.active = false,
     this.label,
     this.onTap,
+    this.iconsOnly = false,
     Key? key,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    if (iconsOnly) {
+      return GestureDetector(
+        onTap: onTap,
+        child: Icon(
+          icon,
+          color: active ? const Color(0xFFCFC3FF) : Colors.white,
+          size: 24,
+        ),
+      );
+    }
     if (active) {
       return GestureDetector(
         onTap: onTap,
@@ -214,7 +235,6 @@ class _BottomNavItem extends StatelessWidget {
         ),
       );
     }
-
     return GestureDetector(
       onTap: onTap,
       child: Icon(icon, color: Colors.white, size: 24),

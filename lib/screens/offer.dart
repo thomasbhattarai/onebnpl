@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-
-import 'package:onebnpl/app/routes.dart';
 import 'package:onebnpl/data/offers_data.dart';
 import 'package:onebnpl/data/user_profile_data.dart';
 import 'package:onebnpl/models/offer.dart';
 import 'package:onebnpl/models/user_profile.dart';
+import 'package:onebnpl/screens/productdetails.dart';
 import 'package:onebnpl/widgets/bottom_navigation.dart';
 
 class OfferPage extends StatelessWidget {
@@ -214,8 +213,23 @@ class OfferPage extends StatelessWidget {
                                                   ? 0
                                                   : 12,
                                             ),
-                                            child: _OfferCard(
-                                              item: items[index],
+                                            child: GestureDetector(
+                                              onTap: () {
+                                                Navigator.push(
+                                                  context,
+                                                  MaterialPageRoute(
+                                                    builder: (_) =>
+                                                        ProductDetailsPage(
+                                                          productId:
+                                                              items[index]
+                                                                  .title,
+                                                        ),
+                                                  ),
+                                                );
+                                              },
+                                              child: _OfferCard(
+                                                item: items[index],
+                                              ),
                                             ),
                                           ),
                                         ),

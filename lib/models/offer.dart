@@ -1,4 +1,5 @@
 class Offer {
+  final String id;
   final String title;
   final String subtitle;
   final String oldPrice;
@@ -6,6 +7,7 @@ class Offer {
   final String imagePath;
 
   const Offer({
+    required this.id,
     required this.title,
     required this.subtitle,
     required this.oldPrice,

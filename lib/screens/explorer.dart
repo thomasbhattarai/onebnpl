@@ -1,10 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:onebnpl/data/products_data.dart';
 import 'package:onebnpl/data/user_profile_data.dart';
 import 'package:onebnpl/models/product.dart';
 import 'package:onebnpl/models/user_profile.dart';
+import 'package:onebnpl/screens/electronics.dart';
+import 'package:onebnpl/screens/homeappliances.dart';
+import 'package:onebnpl/screens/viewmore.dart';
+import 'package:onebnpl/screens/vehicleaccessories.dart';
+
 import 'package:onebnpl/widgets/bottom_navigation.dart';
+import 'productdetails.dart';
 
 class ExplorerPage extends StatefulWidget {
   const ExplorerPage({super.key});
@@ -201,9 +206,31 @@ class _ExplorerPageState extends State<ExplorerPage> {
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: categories
+                                .asMap()
+                                .entries
                                 .map(
-                                  (category) =>
-                                      _CategoryChip(category: category),
+                                  (entry) => _CategoryChip(
+                                    category: entry.value,
+                                    onTap: entry.key <= 3
+                                        ? () {
+                                            Widget page =
+                                                const ElectronicsPage();
+                                            if (entry.key == 1) {
+                                              page = const HomeAppliancesPage();
+                                            } else if (entry.key == 2) {
+                                              page =
+                                                  const VehicleAccessoriesPage();
+                                            } else if (entry.key == 3) {
+                                              page = const ViewMorePage();
+                                            }
+                                            Navigator.of(context).push(
+                                              MaterialPageRoute(
+                                                builder: (_) => page,
+                                              ),
+                                            );
+                                          }
+                                        : null,
+                                  ),
                                 )
                                 .toList(),
                           ),
@@ -296,57 +323,49 @@ class _Category {
   const _Category({required this.label, required this.icon});
 }
 
-class _Product {
-  final String name;
-  final String specs;
-  final String price;
-  final String imagePath;
-
-  const _Product({
-    required this.name,
-    required this.specs,
-    required this.price,
-    required this.imagePath,
-  });
-}
-
 class _CategoryChip extends StatelessWidget {
   final _Category category;
+  final VoidCallback? onTap;
 
-  const _CategoryChip({required this.category});
+  const _CategoryChip({required this.category, this.onTap});
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: 74,
-      padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 6),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(8),
-        boxShadow: const [
-          BoxShadow(
-            color: Color(0x22000000),
-            blurRadius: 4,
-            offset: Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(category.icon, size: 16, color: const Color(0xFF5A4ED1)),
-          const SizedBox(height: 4),
-          Text(
-            category.label,
-            textAlign: TextAlign.center,
-            style: const TextStyle(
-              fontSize: 8,
-              color: Color(0xFF4C3EA6),
-              fontWeight: FontWeight.w600,
-              height: 1.1,
+    final bool isElectronics = category.label == 'Electronics';
+
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        width: 74,
+        padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 6),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(8),
+          boxShadow: const [
+            BoxShadow(
+              color: Color(0x22000000),
+              blurRadius: 4,
+              offset: Offset(0, 2),
             ),
-          ),
-        ],
+          ],
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(category.icon, size: 16, color: const Color(0xFF5A4ED1)),
+            const SizedBox(height: 4),
+            Text(
+              category.label,
+              textAlign: TextAlign.center,
+              style: const TextStyle(
+                fontSize: 8,
+                color: Color(0xFF4C3EA6),
+                fontWeight: FontWeight.w600,
+                height: 1.1,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -359,59 +378,68 @@ class _ProductCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.fromLTRB(8, 8, 8, 8),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: const [
-          BoxShadow(
-            color: Color(0x22000000),
-            blurRadius: 5,
-            offset: Offset(0, 3),
+    return GestureDetector(
+      onTap: () {
+        Navigator.of(context).push(
+          MaterialPageRoute(
+            builder: (context) => ProductDetailsPage(productId: product.name),
           ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Expanded(
-            child: Center(
-              child: Image.asset(product.imagePath, fit: BoxFit.contain),
+        );
+      },
+      child: Container(
+        padding: const EdgeInsets.fromLTRB(8, 8, 8, 8),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(12),
+          boxShadow: const [
+            BoxShadow(
+              color: Color(0x22000000),
+              blurRadius: 5,
+              offset: Offset(0, 3),
             ),
-          ),
-          const SizedBox(height: 4),
-          Text(
-            product.name,
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-            style: const TextStyle(
-              fontSize: 8.5,
-              color: Color(0xFF1E1E1E),
-              fontWeight: FontWeight.w700,
+          ],
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Expanded(
+              child: Center(
+                child: Image.asset(product.imagePath, fit: BoxFit.contain),
+              ),
             ),
-          ),
-          Text(
-            product.specs,
-            maxLines: 2,
-            overflow: TextOverflow.ellipsis,
-            style: const TextStyle(
-              fontSize: 7.5,
-              color: Color(0xFF6F6F6F),
-              fontWeight: FontWeight.w500,
-              height: 1.15,
+            const SizedBox(height: 6),
+            Text(
+              product.name,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: const TextStyle(
+                fontSize: 8.5,
+                color: Color(0xFF1E1E1E),
+                fontWeight: FontWeight.w700,
+              ),
             ),
-          ),
-          const SizedBox(height: 2),
-          Text(
-            product.price,
-            style: const TextStyle(
-              fontSize: 8.5,
-              color: Color(0xFF4C3EA6),
-              fontWeight: FontWeight.w700,
+            Text(
+              product.specs,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+              style: const TextStyle(
+                fontSize: 7.5,
+                color: Color(0xFF6F6F6F),
+                fontWeight: FontWeight.w500,
+                height: 1.15,
+              ),
             ),
-          ),
-        ],
+            const SizedBox(height: 2),
+            Text(
+              product.price,
+              style: const TextStyle(
+                fontSize: 8.5,
+                color: Color(0xFF4C3EA6),
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
